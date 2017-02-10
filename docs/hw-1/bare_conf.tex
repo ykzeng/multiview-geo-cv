@@ -145,6 +145,7 @@
 \let\oldvec\vec
 \renewcommand{\vec}[1]{\oldvec{\mathit{#1}}}
 \newcommand{\mat}[1]{\mathbf{#1}} % undergraduate algebra version
+\newcommand{\parallelsum}{\mathbin{\!/\mkern-5mu/\!}}
 \graphicspath{{pics/}}
 %\newcommand{\mat}[1]{\bm{\mathit{#1}}}
 
@@ -363,18 +364,47 @@ As we know, the pictures taken by a camera is actually projections of Euclidean 
 \section{Affine rectification using parallelism}
 The key of using parallel lines in projective space to recover affine properties from images is the infinite line. In the affinity space, the infinite line is a fixed line $l_{\infty} = (0, 0, 1)^T$, however a projective transformation might maps $l_{\infty}$ from the fixed line at infinity to a finite line $l$ on the space after projection. Then, say we have the infinite line $l = (l_1, l_2, l_3)^T$ in a projective space, where $l_3\neq 0$, and the homography of this current projection $\mat{H}$ can be divided as:
 \begin{equation}
-	\mat{H}=\mat{H_A}
+	\mat{H}=\mat{H}_A\mat{H}_P
+\end{equation}
+\noindent where $\mat{H}_A$ is the affine homography and the last matrix $\mat{H}_P$ is the homography for transformation from affine space to current projective space:
+\begin{equation}
+	\mat{H}_P = 
 	\begin{bmatrix}
 		1 & 0 & 0 \\
 		0 & 1 & 0 \\
 		l_1 &  l_2 & l_3
 	\end{bmatrix}
 \end{equation}
-\noindent where $\mat{H_A}$ is the affine homography and the last matrix is the homography for transformation from affine space to current projective space, that is to say, the current projective transformation can be decomposed into two parts, one is the transformation to affine space and the other one is the transformation from affinity to current projective space, and the later one can be directly calculated if the infinite line is given.
+
+\noindent That is to say, the current projective transformation can be decomposed into two parts, one is the transformation to affine space and the other one is the transformation from affinity to current projective space, and the later one can be directly calculated if the infinite line is given.
 
 Now that we figured out the infinite line could help us back to affinity, we can start to work on the details to calculate the infinite line. We know that in Euclidean space, two parallel line will intersect at an ideal point on infinite line, and if we can get two ideal points then we can easily calculate the infinite line as two points determine a line. Intuitively, we can identify two pairs of parallel lines from the distorted picture and calculate two ideal points through them to form the infinite line and then we can get back to affinity based on our discussion above.
 
-Suppose we have 
+Suppose we have four points $p_1, p_2, p_3, p_4$ and they form a rectangle similar to what we have in question 1, through those we can simply get two pairs of parallel lines:
+\begin{equation}
+\begin{split}
+	\vec{l}_1 = p_1 \times p_2\\
+	\vec{l}_2 = p_3 \times p_4\\
+	\vec{m}_1 = p_1 \times p_3\\
+	\vec{m}_2 = p_2 \times p_4
+\end{split}
+\end{equation}
+
+\noindent in which we have $l_1\parallelsum l_2$ and $m_1\parallelsum m_2$. Through those pairs of parallel lines, we can further compute two points at the infinite line as follows:
+\begin{equation}
+\begin{split}
+	v_1 &= \vec{l}_1\times \vec{l}_2\\
+	v_2 &= \vec{m}_1 \times \vec{m}_2
+\end{split}
+\end{equation}
+
+\noindent And finally we can acquire the line at infinity $\vec{l}_{\infty} = (l_1, l_2, l_3)$ which can be calculated by:
+\begin{equation}
+	\vec{l}_{\infty} = v_1 \times v_2
+\end{equation}
+
+\noindent According to our discussion above, now we can form a new matrix same as given in equation 10 based on the infinite line, and the new $\mat{H}_P$ can handle the transformation between the picture space and affinity.
+
 % conference papers do not normally have an appendix
 
 
