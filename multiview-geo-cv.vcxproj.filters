@@ -35,5 +35,8 @@
     <ClCompile Include="src\examples\cam-still.cpp">
       <Filter>Source Files\examples</Filter>
     </ClCompile>
+    <ClCompile Include="affine-rectify.cpp">
+      <Filter>Source Files\hw-1</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,8 +9,8 @@
 using namespace cv;
 using namespace std;
 
-int main() {
-  Mat imgOriginal, imgOut, myOut;        // input image
+int rectify() {
+  Mat imgOriginal, imgOut, myOut;        // input image, output image after findHomo, my output
 
   imgOriginal = imread("pics\\hw1-1.jpg");          // open image
   imgOut = imgOriginal.clone();

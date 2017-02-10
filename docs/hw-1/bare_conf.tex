@@ -238,7 +238,7 @@ Email: yzeng@tamu.edu}}
 
 
 \section{Four point rectification}
-First I'd like to briefly summarize the goal and methodology for this rectification problem. As we know, the pictures taken by a camera is actually projections of Euclidean prototype of real-world scenarios. Assuming we have a point in the Euclidean space whose homogenized coordinate is $(x, y, z)$, and its counterpart in projective space, or in the picture, is $(x^\prime , y^\prime , z)$. According to the definition of projective transformation, the planar projective transformation can be represented by a non-singular $3\times 3$ matrix:
+As we know, the pictures taken by a camera is actually projections of Euclidean prototype of real-world scenarios. Assuming we have a point in the Euclidean space whose homogenized coordinate is $(x, y, z)$, and its counterpart in projective space, or in the picture, is $(x^\prime , y^\prime , z)$. According to the definition of projective transformation, the planar projective transformation can be represented by a non-singular $3\times 3$ matrix:
 \begin{equation}
 	\begin{pmatrix}
 		x^\prime \\
@@ -258,7 +258,7 @@ First I'd like to briefly summarize the goal and methodology for this rectificat
 	\end{pmatrix}
 \end{equation}
 
-\noindent More briefly as $\mat{x^\prime} = \mat{H} \mat{x}$, this can be further transformed into (note that by default we assume $h_{33} = 1$):
+\noindent more briefly as $\mat{x^\prime} = \mat{H} \mat{x}$, this can be further transformed into (note that by default we assume $h_{33} = 1$):
 \begin{equation}
 	\begin{split}
 		x^\prime &= h_{11}x + h_{12}y + h_{13}z\\
@@ -267,7 +267,7 @@ First I'd like to briefly summarize the goal and methodology for this rectificat
 	\end{split}
 \end{equation}
 
-However, this is up scale, and if we go down scale and set $z^\prime = 1, z = 1$, it turns out that it can be transformed through equation 3--5:
+\noindent However, this is up scale, and if we go down scale and set $z^\prime = 1, z = 1$, it turns out that it can be transformed through equation 3--5:
 \begin{equation}
 	\begin{split}
 		x^\prime &=\frac{ h_{11}x + h_{12}y + h_{13}}{h_{31}x + h_{32}y + 1}\\
@@ -351,6 +351,30 @@ However, this is up scale, and if we go down scale and set $z^\prime = 1, z = 1$
 	\end{split}
 \end{equation}
 
+\noindent Then, we solve the above simultaneous linear equations thereby getting the homograpy $\mat{H}$ and apply the homography on the original picture to rectify it, hereby the question 1 is solved and a review of solution steps is listed as follows:
+\begin{enumerate}
+	\item Pick up 4 apex points of a rectangle in the picture and get their coordinates.
+	\item Acquire the coordinates of those points picked in the actual Euclidean space (as we just want to rectify the image here we just arbitrarily select 4 coordinates that can form a rectangle and ignores things about scales and actual location).
+	\item Do reverse homography to get the homography matrix using those coordinates we get.
+	\item Apply the homography we get to all points in the picture space and get the rectified image.
+\end{enumerate}
+
+
+\section{Affine rectification using parallelism}
+The key of using parallel lines in projective space to recover affine properties from images is the infinite line. In the affinity space, the infinite line is a fixed line $l_{\infty} = (0, 0, 1)^T$, however a projective transformation might maps $l_{\infty}$ from the fixed line at infinity to a finite line $l$ on the space after projection. Then, say we have the infinite line $l = (l_1, l_2, l_3)^T$ in a projective space, where $l_3\neq 0$, and the homography of this current projection $\mat{H}$ can be divided as:
+\begin{equation}
+	\mat{H}=\mat{H_A}
+	\begin{bmatrix}
+		1 & 0 & 0 \\
+		0 & 1 & 0 \\
+		l_1 &  l_2 & l_3
+	\end{bmatrix}
+\end{equation}
+\noindent where $\mat{H_A}$ is the affine homography and the last matrix is the homography for transformation from affine space to current projective space, that is to say, the current projective transformation can be decomposed into two parts, one is the transformation to affine space and the other one is the transformation from affinity to current projective space, and the later one can be directly calculated if the infinite line is given.
+
+Now that we figured out the infinite line could help us back to affinity, we can start to work on the details to calculate the infinite line. We know that in Euclidean space, two parallel line will intersect at an ideal point on infinite line, and if we can get two ideal points then we can easily calculate the infinite line as two points determine a line. Intuitively, we can identify two pairs of parallel lines from the distorted picture and calculate two ideal points through them to form the infinite line and then we can get back to affinity based on our discussion above.
+
+Suppose we have 
 % conference papers do not normally have an appendix
 
 
