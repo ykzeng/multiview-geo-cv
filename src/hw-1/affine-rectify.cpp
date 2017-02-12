@@ -36,14 +36,16 @@ int main() {
     *vanishLine = cvCreateMat(1, 3, CV_64FC1);
 
   //calculating parallel line
+  /*cout << "The two upper rectangle apexes:" << endl;
   cout << "(" << CV_MAT_ELEM(pt1, double, 0, 0) 
     << ", " << CV_MAT_ELEM(pt1, double, 0, 1) << ")" << endl;
   cout << "(" << CV_MAT_ELEM(pt2, double, 0, 0)
-    << ", " << CV_MAT_ELEM(pt2, double, 0, 1) << ")" << endl;
+    << ", " << CV_MAT_ELEM(pt2, double, 0, 1) << ")" << endl;*/
   cvCrossProduct(&pt1, &pt2, l1);
+  /*cout << "The first parallel line: " << endl;
   cout << "(" << CV_MAT_ELEM(*l1, double, 0, 0)
     << ", " << CV_MAT_ELEM(*l1, double, 0, 1) 
-    << ", " << CV_MAT_ELEM(*l1, double, 0, 2) << ")" << endl;
+    << ", " << CV_MAT_ELEM(*l1, double, 0, 2) << ")" << endl;*/
   cvCrossProduct(&pt3, &pt4, l2);
   cvCrossProduct(&pt1, &pt3, m1);
   cvCrossProduct(&pt2, &pt4, m2);
@@ -52,6 +54,19 @@ int main() {
   cvCrossProduct(l1, l2, v1);
   cvCrossProduct(m1, m2, v2);
   cvCrossProduct(v1, v2, vanishLine);
+
+  // idea from https://engineering.purdue.edu/kak/computervision/ECE661.08/solution/hw2_s2.pdf
+  // normalize vanishing line
+  // in order to map the distorted image back to the image window
+  double scale = 3.0;
+  cvmSet(vanishLine, 0, 0, cvmGet(vanishLine, 0, 0) / cvmGet(vanishLine, 0, 2)*scale);
+  cvmSet(vanishLine, 0, 1, cvmGet(vanishLine, 0, 1) / cvmGet(vanishLine, 0, 2)*scale);
+  cvmSet(vanishLine, 0, 2, 1.0*scale);
+
+  /*cout << "The vanishing line:" << endl;
+  cout << "(" << CV_MAT_ELEM(*vanishLine, double, 0, 0)
+    << ", " << CV_MAT_ELEM(*vanishLine, double, 0, 1)
+    << ", " << CV_MAT_ELEM(*vanishLine, double, 0, 2) << ")" << endl;*/
 
   CvMat *homo = cvCreateMat(3, 3, CV_64FC1);
   cvSetZero(homo);
@@ -62,8 +77,8 @@ int main() {
   cvmSet(homo, 2, 2, cvmGet(vanishLine, 0, 2));
 
   cv::warpPerspective(imgOriginal, myOut, cvarrToMat(homo), imgOriginal.size());
-
-  cv::imshow("MyAffineTransform", myOut);
+  cv:imwrite(".\\test.jpeg", myOut);
+  //cv::imshow("MyAffineTransform", myOut);
 
   waitKey(0);
 }
