@@ -405,6 +405,91 @@ Suppose we have four points $p_1, p_2, p_3, p_4$ and they form a rectangle simil
 
 \noindent According to our discussion above, now we can form a new matrix same as given in equation 10 based on the infinite line, and the new $\mat{H}_P$ can handle the transformation between the picture space and affinity.
 
+\section{From Affinity to normal: a two step approach}
+Now that we have got the image $\mat{I}_A$ that is affinely rectified (1st step), we can further remove the affine distortion from it (step 2) through using $C_{\infty}^*$, basically to find the $\mat{H}_A$ in equation 9 so that:
+\begin{equation}
+	\mat{H}_A = \begin{bmatrix}
+		A & \vec{t} \\
+		\vec{0} & 1
+	\end{bmatrix}
+\end{equation}
+and if we apply $\mat{H}_A$ on the affinely rectified image we can get the real-world image:
+\begin{equation}
+	\mat{I}_{real} = \mat{H}_A\mat{I}_A
+\end{equation} 
+
+\noindent To solve $\mat{H}_A$, suppose we have two orthogonal lines on the world plane $\vec{l}\bot \vec{m}$, where $\vec{l} = (l_1, l_2, l_3), \vec{m} = (m_1, m_2, m_3)$, and $\vec{l^\prime} = (l_1^\prime, l_2^\prime, l_3^\prime), \vec{m^\prime} = (m_1^\prime, m_2^\prime, m_3^\prime)$ are the two projected lines in the affine plane. If we do a dehomogenization for $\vec{l}, \vec{m}$, we have:
+\begin{equation}
+\begin{split}
+	\vec{l} &= (l_1/l_3, l_2/l_3)\\
+	\vec{m} &= (m_1/m_3, m_2/m_3)
+\end{split}
+\end{equation}
+After which we can use the orthogonality so that we have:
+\begin{equation}
+\begin{split}
+	(l_1/l_3, l_2/l_3)(m_1/m_3, m_2/m_3)^T &= 0\\
+	\Leftrightarrow l_1m_1+l_2m_2 &= 0
+\end{split}
+\end{equation}
+
+\noindent Now we introduce the dual degenerate conic:
+\begin{equation}
+	C^*_{\infty} =
+	\begin{pmatrix}
+		1 & 0 & 0\\
+		0 & 1 & 0\\
+		0 & 0 & 0
+	\end{pmatrix}
+\end{equation}
+
+\noindent So that we have:
+\begin{equation}
+	l_1m_1 + l_2m_2 = \vec{l}^T C^*_{\infty} \vec{m} = 0
+\end{equation}
+
+\noindent Since we know the fact that:
+\begin{equation}
+	\begin{split}
+	\vec{l}^T &= \vec{l^\prime}^TH_{A}\\
+	\vec{m} &= H_{A}^T\vec{m^\prime}
+	\end{split}
+\end{equation}
+
+\noindent we can transform equation 19 to:
+\begin{equation}
+	\begin{split}
+		\vec{l}^T C^*_{\infty} \vec{m} &= \vec{l^\prime}^TH_{A}C_{\infty}^*H_A^T\vec{m^\prime}\\
+		&= \vec{l^\prime}^T
+		\begin{pmatrix}
+			A & \vec{t}\\
+			\vec{0} & 1
+		\end{pmatrix}
+		\begin{pmatrix}
+			\vec{I} & \vec{0}\\
+			\vec{0} & \vec{1}
+		\end{pmatrix}
+		\begin{pmatrix}
+			A^T & \vec{0}\\
+			\vec{t}^T & 1
+		\end{pmatrix}
+		\vec{m^\prime}\\
+		& = \vec{l^\prime}^T
+		\begin{pmatrix}
+			AA^T & \vec{0}\\
+			\vec{0} & 0
+		\end{pmatrix}
+		\vec{m^\prime}
+	\end{split}
+\end{equation}
+
+
+\noindent If we plug $\vec{l^\prime} = (l_1^\prime, l_2^\prime, l_3^\prime), \vec{m^\prime} = (m_1^\prime, m_2^\prime, m_3^\prime)$ into equation 21 we will have:
+\begin{equation}
+	(l_1^\prime, l_2^\prime)AA^T(m_1^\prime, m_2^\prime)^T = 0
+\end{equation}
+
+
 % conference papers do not normally have an appendix
 
 

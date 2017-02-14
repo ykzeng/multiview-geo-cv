@@ -23,9 +23,12 @@
     <Image Include="pics\hw1-2.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="affine-rectify.cpp" />
     <ClCompile Include="src\examples\cam-still.cpp" />
+    <ClCompile Include="src\hw-1\main.cpp" />
     <ClCompile Include="src\hw-1\rectification.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\hw-1\rectifyToAffinity.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9DB86B04-3AA8-4D66-9EF9-0DFABE57461F}</ProjectGuid>
