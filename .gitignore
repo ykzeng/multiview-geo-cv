@@ -240,3 +240,7 @@ TSWLatexianTemp*
 
 # expex forward references with \gathertags
 *-tags.tex
+
+# ignore pictures
+*.jpeg
+*.png
