@@ -361,16 +361,19 @@ As we know, the pictures taken by a camera is actually projections of Euclidean 
 	\item Apply the homography we get to all points in the picture space and get the rectified image.
 \end{enumerate}
 
-To validate our solution, we did several experiments using our four point rectification approach and get the following results, for every result we attached the original image by its side for convenience of comparison. 
+To validate our solution, we did several experiments using our four point rectification approach and get the following results as shown in Figure \ref{four-point-comparison-1}, for every result we attached the original image with selected points highlighted by its side for convenience of comparison. 
 \begin{figure*}
   \centering
-  \subfigure[Result Using Our Four Point Rectification Approach]{
-    \label{four-point-normal-1} %% label for first subfigure
-    \includegraphics[width=0.49\linewidth]{four-point-normal-1.jpeg}}
-  \subfigure[Result Using findHomography in OpenCV]{
-    \label{findhomo-1} %% label for second subfigure
+  \subfigure[Result of findHomography in OpenCV]{
+    \label{findhomo-1} %% label for first subfigure
     \includegraphics[width=0.49\linewidth]{findhomo-1.jpeg}}
-  \caption{findHomograph vs. Our Approach for Picture 1}
+  \subfigure[Result of Our Four Point Rectification Approach]{
+    \label{four-point-normal-1} %% label for second subfigure
+    \includegraphics[width=0.49\linewidth]{four-point-normal-1.jpeg}}
+ \subfigure[The Point Choice in Original Picture (Apexes of Highlighted Green Rectangle)]{
+    \label{hw1-wall-rec} %% label for first subfigure
+    \includegraphics[width=0.49\linewidth]{hw1-wall-rec.jpeg}}
+  \caption{Four Point Rectification vs. findHomography in OpenCV}
   \label{four-point-comparison-1} %% label for entire figure
 \end{figure*}
 
@@ -426,6 +429,22 @@ To summarize, the following steps are needed when we are doing the affine rectif
 	\item From the two ideal points we can now get line of infinity in the picture plane.
 	\item Since we know the coordinates of infinite line in the world plane, we can now solve the homography transformation from picture plane to affinity.
 \end{enumerate}
+
+Both result we got from rectifying from the wall and the floor is show in Figure \ref{affine-rectify-wall-floor}, from the wall rectification part we can see that parallelism is recovered. However, I still do not know how to transform Figure \ref{affinity-floor-1} to show the parallelism recovery of rectification result through the floor plane, sorry about that.
+\begin{figure*}
+  \centering
+  \subfigure[Result of Affine Rectification from the Wall]{
+    \label{affinity-wall-1} %% label for first subfigure
+    \includegraphics[width=0.49\linewidth]{affinity-wall-1.jpeg}}
+  \subfigure[Result of Affine Rectification from Squares on the Floor]{
+    \label{affinity-floor-1} %% label for second subfigure
+    \includegraphics[width=0.49\linewidth]{affinity-floor-1.jpeg}}
+ \subfigure[The Point Choice in Original Picture (Apexes of Highlighted Green Rectangle)]{
+    \label{hw1-wall-rec} %% label for first subfigure
+    \includegraphics[width=0.49\linewidth]{hw1-wall-rec.jpeg}}
+  \caption{Affinely Rectification through Wall vs. Floor}
+  \label{affine-rectify-wall-floor} %% label for entire figure
+\end{figure*}
 
 \section{From Affinity to normal: a two step approach}
 Now that we have got the image $\mat{I}_A$ that is affinely rectified (1st step), we can further remove the affine distortion from it (step 2) through using $C_{\infty}^*$, basically to find the $\mat{H}_A$ in equation 9 so that:
@@ -510,8 +529,47 @@ After which we can use the orthogonality so that we have:
 \begin{equation}
 	(l_1^\prime, l_2^\prime)AA^T(m_1^\prime, m_2^\prime)^T = 0
 \end{equation}
+\noindent Since $AA^T$ is definitely a symmetric matrix, we can assume $S=AA^T=\begin{pmatrix}
+s_{11} & s_{12}\\
+s_{12} & 1
+\end{pmatrix}$.\\
 
+\noindent After which we have:
+\begin{equation}
+	(l_1^\prime, l_2^\prime)
+	\begin{pmatrix}
+		s_{11} & s_{12}\\
+		s_{12} & 0
+	\end{pmatrix}
+	(m_1^\prime, m_2^\prime)^T = 0
+\end{equation}
 
+\noindent Which is a simultaneous linear equations with 2 DoFs, thus we can solve $s_{11}, s_{12}$ if we have two pairs of orthogonal lines in real-world plane.
+
+\noindent So basically what we need to do in this question is:
+\begin{enumerate}
+	\item Find two pairs of orthogonal lines in real-world plane.
+	\item Transform those orthogonal lines pairs from picture space to affined space.
+	\item Build simultaneous linear equations of form in equation 23 and solve it to get $S$.
+	\item Use Singular Value Decomposition APIs in OpenCV to solve $A$ from $S$ and then construct the homography from affined space to world space.
+\end{enumerate}
+
+To validate the correctness of our approach, we did experiment on the picture 1 and rectified it leveraging the squares on the floor plane, we can see from the result Figure \ref{two-floor-1} that the squares on the floor is correctly recovered.
+
+\begin{figure*}[!hpbt]
+  \subfigure[Two-Step Rectification through Floor Square]{
+\label{two-floor-1} %% label for second subfigure
+\includegraphics[width=0.49\linewidth]{two-floor-1.jpeg}}
+ \subfigure[The Point Choice in Original Picture (Apexes of Highlighted Green Rectangle)]{
+    \label{hw1-floor-sqr} %% label for first subfigure
+    \includegraphics[width=0.49\linewidth]{hw1-floor-sqr.jpg}}
+  \caption{Two-Step Rectification through Floor Plane}
+  \label{two-step-rectify-floor} %% label for entire figure
+\end{figure*}
+
+\section{Important Results}
+
+\section{Discussions}
 % conference papers do not normally have an appendix
 
 
@@ -543,9 +601,9 @@ After which we can use the orthogonality so that we have:
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
-\bibliographystyle{IEEEtran}
+%\bibliographystyle{IEEEtran}
 % argument is your BibTeX string definitions and bibliography database(s)
-\bibliography{refs}
+%\bibliography{refs}
 
 
 

@@ -45,9 +45,9 @@ int main() {
   // define the homo from picture space to affinity
   CvMat *H_A = cvCreateMat(3, 3, CV_64FC1);
   cvSetZero(H_A);
-  /*rectifyToAffinity(imgOriginal, pts, H_A, affinityOut);
-  affinityToNormal(affinityOut, pts, H_A, normalOut);*/
-  rectifyToAffinity(imgOriginal, sqr_pts, H_A, affinityOut);
-  affinityToNormal(imgOriginal, sqr_pts, H_A, normalOut);
+  rectifyToAffinity(imgOriginal, pts, H_A, affinityOut);
+  affinityToNormal(imgOriginal, pts, H_A, normalOut);
+  /*rectifyToAffinity(imgOriginal, sqr_pts, H_A, affinityOut);
+  affinityToNormal(imgOriginal, sqr_pts, H_A, normalOut);*/
   waitKey(0);
 }
