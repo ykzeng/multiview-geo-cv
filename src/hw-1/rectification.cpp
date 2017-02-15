@@ -9,17 +9,16 @@
 using namespace cv;
 using namespace std;
 
-int rectify() {
-  Mat imgOriginal, imgOut, myOut;        // input image, output image after findHomo, my output
+void rectify() {
+  Mat imgOriginal, standardOut, fourPOut;        // input image, output image after findHomo, my output
 
   imgOriginal = imread("pics\\hw1-1.jpg");          // open image
-  imgOut = imgOriginal.clone();
-  myOut = imgOriginal.clone();
+  standardOut = imgOriginal.clone();
+  fourPOut = imgOriginal.clone();
 
   if (imgOriginal.empty()) {                                  // if unable to open image
     std::cout << "error: image not read from file\n\n";     // show error message on command line
     _getch();                                               // may have to modify this line if not using Windows
-    return(0);                                              // and exit program
   }
   
   int xy[4][2] = { {1271, 546},
@@ -45,10 +44,10 @@ int rectify() {
 
   Mat homography = findHomography(pts_src, pts_dest);
 
-  cv::warpPerspective(imgOriginal, imgOut, homography, imgOriginal.size());
+  cv::warpPerspective(imgOriginal, standardOut, homography, imgOriginal.size());
 
   cv::imshow("Original", imgOriginal);
-  cv::imshow("Rectified", imgOut);
+  cv::imshow("Rectified", standardOut);
 
   CvMat *p_mat = cvCreateMat(8, 8, CV_64FC1), 
     *h_vec = cvCreateMat(8, 1, CV_64FC1), 
@@ -109,9 +108,9 @@ int rectify() {
 
   Mat my_homo = cvarrToMat(my_cv_homo);
 
-  cv::warpPerspective(imgOriginal, myOut, my_homo, imgOriginal.size());
+  cv::warpPerspective(imgOriginal, fourPOut, my_homo, imgOriginal.size());
 
-  cv::imshow("MyTransform", myOut);
+  cv::imshow("MyTransform", fourPOut);
 
   waitKey(0);
 

@@ -86,7 +86,7 @@ void test() {
 }
 
 
-
+//============================================================================================================================
 // @param imgOriginal the original img for rectification
 // @param H_A the transformation matrix from picture space to affinity
 void rectifyToAffinity(const Mat& imgOriginal, const CvMat* pts, CvMat* H_A, Mat& imgOut) {
@@ -158,6 +158,51 @@ void rectifyToAffinity(const Mat& imgOriginal, const CvMat* pts, CvMat* H_A, Mat
   //cv::imshow("MyAffineTransform", myOut);
 }
 
+//====================================================================================================================================
+//void affinityToNormal(const Mat& imgAffine, CvMat* pts, CvMat* H_A, Mat& result) {
+//  // we assume the four input points are from apexes of a rectangle
+//  // 0 1
+//  // 2 3 then perpendicular line pairs include (01, 02), (03, 12)
+//  CvMat *pt_tmp = cvCreateMat(1, 3, CV_64FC1);
+//  for (int i = 0; i < 4; i++)
+//  {
+//    // get the current row of the input four points
+//    CvMat* row = cvCreateMat(1, 3, CV_64FC1);
+//    cvGetRow(pts, row, i);
+//    // multiply the points with H_A
+//    cvMatMul(H_A, row, pt_tmp);
+//    // down scale the current point coordinates and put them into the pts array
+//    cvmSet(pts, i, 0, ((int)(cvmGet(pt_tmp, 0, 0) / cvmGet(pt_tmp, 0, 2))));
+//    cvmSet(pts, i, 1, ((int)(cvmGet(pt_tmp, 0, 1) / cvmGet(pt_tmp, 0, 2))));
+//    cvmSet(pts, i, 2, 1.0);
+//  }
+//  // get all the affined points
+//  CvMat *pt1 = cvCreateMat(1, 3, CV_64FC1),
+//      *pt2 = cvCreateMat(1, 3, CV_64FC1),
+//      *pt3 = cvCreateMat(1, 3, CV_64FC1),
+//      *pt4 = cvCreateMat(1, 3, CV_64FC1);
+//  cvGetRow(pts, pt1, 0);
+//  cvGetRow(pts, pt2, 1);
+//  cvGetRow(pts, pt3, 2);
+//  cvGetRow(pts, pt4, 3);
+//  // init all perpendicular lines
+//  CvMat *l1 = cvCreateMat(1, 3, CV_64FC1),
+//    *l2 = cvCreateMat(1, 3, CV_64FC1),
+//    *m1 = cvCreateMat(1, 3, CV_64FC1),
+//    *m2 = cvCreateMat(1, 3, CV_64FC1);
+//  // cross product to get those lines
+//  cvCrossProduct(pt1, pt2, l1);
+//  cvCrossProduct(pt1, pt3, m1);
+//  cvCrossProduct(pt1, pt4, l2);
+//  cvCrossProduct(pt3, pt2, m2);
+//  //coordinates of perpendicular lines
+//  double l[2][2] = { {cvmGet(l1, 0, 0) , cvmGet(l1, 0, 1)},
+//  {cvmGet(l2, 0, 0), cvmGet(l2, 0, 1) }
+//  };
+//  double m[2][2] = { { cvmGet(m1, 0, 0) , cvmGet(m1, 0, 1) },
+//  { cvmGet(m2, 0, 0), cvmGet(m2, 0, 1) } 
+//  };
+//}
 // TODO: maybe we want to use constant points
 void affinityToNormal(const Mat& imgOriginal, CvMat* pts, CvMat* H_A, Mat& result) {
   Mat myOut;        // input image, output image after findHomo, my output
@@ -171,8 +216,18 @@ void affinityToNormal(const Mat& imgOriginal, CvMat* pts, CvMat* H_A, Mat& resul
     CvMat *row = cvCreateMat(1, 3, CV_64FC1);
     // get a point
     cvGetRow(pts, row, i);
+    /*cout << "The row:" << endl;
+    cout << "(" << CV_MAT_ELEM(*row, double, 0, 0)
+      << ", " << CV_MAT_ELEM(*row, double, 0, 1)
+      << ", " << CV_MAT_ELEM(*row, double, 0, 2) << ")" << endl;*/
     // multiply with H_A to get it's coordinates in affinity and save in pt
-    cvMatMul(H_A, row, pt);
+    cvMatMul(row, H_A, pt);
+
+    /*cout << "The row:" << endl;
+    cout << "(" << CV_MAT_ELEM(*row, double, 0, 0)
+    << ", " << CV_MAT_ELEM(*row, double, 0, 1)
+    << ", " << CV_MAT_ELEM(*row, double, 0, 2) << ")" << endl;*/
+
     cvmSet(pts, i, 0, (int)(cvmGet(pt, 0, 0) / cvmGet(pt, 0, 2)));
     cvmSet(pts, i, 1, (int)(cvmGet(pt, 0, 1) / cvmGet(pt, 0, 2)));
     cvmSet(pts, i, 2, 1.0);
@@ -203,9 +258,9 @@ void affinityToNormal(const Mat& imgOriginal, CvMat* pts, CvMat* H_A, Mat& resul
   //get all the perpendicular lines
   //pairs: (l1, l2), (m1, m2)
   cvCrossProduct(pt1, pt2, l1);
-  cvCrossProduct(pt1, pt3, l2);
-  cvCrossProduct(pt1, pt4, m2);
-  cvCrossProduct(pt3, pt2, m1);
+  cvCrossProduct(pt1, pt3, m1);
+  cvCrossProduct(pt1, pt4, l2);
+  cvCrossProduct(pt3, pt2, m2);
 
   //coordinates of perpendicular lines
   double l[2][2] = { {cvmGet(l1, 0, 0) , cvmGet(l1, 0, 1)},
@@ -218,7 +273,9 @@ void affinityToNormal(const Mat& imgOriginal, CvMat* pts, CvMat* H_A, Mat& resul
   //according to coordinates of perpendicular lines, build the simultaneous linear equations
   double M_data[] = { l[0][0] * m[0][0], l[0][0] * m[0][1] + l[0][1] * m[0][0],
   l[1][0] * m[1][0], l[1][0] * m[1][1] + l[1][1] * m[1][0] };
+
   double b_data[] = { -l[0][1] * m[0][1], -l[1][1] * m[1][1] };
+
   CvMat *M = &(cvMat(2, 2, CV_64FC1, M_data));
   CvMat *b = &(cvMat(2, 1, CV_64FC1, b_data));
   CvMat *x = cvCreateMat(2, 1, CV_64FC1);
@@ -297,4 +354,103 @@ void affinityToNormal(const Mat& imgOriginal, CvMat* pts, CvMat* H_A, Mat& resul
   //cvReleaseImage(&img_scene);
   //cvReleaseImage(&img_interp);
   //return 0;
+}
+
+//==========================================================================================================
+void fourPointRectify(const Mat& imgOriginal, Mat& standardOut, Mat& fourPOut) {
+  standardOut = imgOriginal.clone();
+  fourPOut = imgOriginal.clone();
+
+  int xy[4][2] = { { 1271, 546 },
+  { 1626, 537 },
+  { 1276, 936 },
+  { 1619, 877 } };
+
+  int _xy[4][2] = { { 1271, 546 },
+  { 1626, 546 },
+  { 1271, 877 },
+  { 1626, 877 } };
+
+  vector<Point2f> pts_src, pts_dest;
+  pts_src.push_back(Point2f(1271, 546));
+  pts_src.push_back(Point2f(1626, 537));
+  pts_src.push_back(Point2f(1276, 936));
+  pts_src.push_back(Point2f(1619, 877));
+
+  pts_dest.push_back(Point2f(1271, 546));
+  pts_dest.push_back(Point2f(1626, 546));
+  pts_dest.push_back(Point2f(1271, 877));
+  pts_dest.push_back(Point2f(1626, 877));
+
+  Mat homography = findHomography(pts_src, pts_dest);
+
+  cv::warpPerspective(imgOriginal, standardOut, homography, imgOriginal.size());
+
+  //cv::imshow("Original", imgOriginal);
+  //cv::imshow("Rectified", standardOut);
+
+  CvMat *p_mat = cvCreateMat(8, 8, CV_64FC1),
+    *h_vec = cvCreateMat(8, 1, CV_64FC1),
+    *xy_mat = cvCreateMat(8, 1, CV_64FC1);
+
+  cvSetZero(p_mat);
+  cvSetZero(h_vec);
+  cvSetZero(xy_mat);
+
+  for (int i = 0; i < 4; i++)
+  {
+    //pi
+    //col0: x
+    cvmSet(p_mat, (i * 2), 0, xy[i][0]);
+    //col1: y
+    cvmSet(p_mat, (i * 2), 1, xy[i][1]);
+    //col2: 1
+    cvmSet(p_mat, (i * 2), 2, 1);
+    //col3-5: 0
+    //col6: -_xx
+    int _xx = xy[i][0] * _xy[i][0];
+    cvmSet(p_mat, (i * 2), 6, -_xx);
+    //col7: -_xy
+    int y_x = xy[i][1] * _xy[i][0];
+    cvmSet(p_mat, (i * 2), 7, -y_x);
+
+    //_pi
+    //col0-2: 0
+    //col3: xi
+    cvmSet(p_mat, (i * 2 + 1), 3, xy[i][0]);
+    //col4: yi
+    cvmSet(p_mat, (i * 2 + 1), 4, xy[i][1]);
+    //col5: 1
+    cvmSet(p_mat, (i * 2 + 1), 5, 1);
+    //col6: -xi_yi
+    int x_y = xy[i][0] * _xy[i][1];
+    cvmSet(p_mat, (i * 2 + 1), 6, -x_y);
+    //col7: -yi_yi
+    int y_y = xy[i][1] * _xy[i][1];
+    cvmSet(p_mat, (i * 2 + 1), 7, -y_y);
+
+    //one col mat consists of _x and _y
+    cvmSet(xy_mat, (i * 2), 0, _xy[i][0]);
+    cvmSet(xy_mat, (i * 2 + 1), 0, _xy[i][1]);
+  }
+  //p_mat.
+  //solve()
+  cvSolve(p_mat, xy_mat, h_vec);
+
+  CvMat *my_cv_homo = cvCreateMat(3, 3, CV_64FC1);
+
+  for (int i = 0; i < 8; i++)
+  {
+    int row = i / 3, col = i % 3;
+    cvmSet(my_cv_homo, row, col, cvmGet(h_vec, i, 0));
+  }
+  cvmSet(my_cv_homo, 2, 2, 1);
+
+  Mat my_homo = cvarrToMat(my_cv_homo);
+
+  cv::warpPerspective(imgOriginal, fourPOut, my_homo, imgOriginal.size());
+
+  //cv::imshow("MyTransform", fourPOut);
+
+  waitKey(0);
 }

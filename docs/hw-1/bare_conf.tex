@@ -147,6 +147,7 @@
 \newcommand{\mat}[1]{\mathbf{#1}} % undergraduate algebra version
 \newcommand{\parallelsum}{\mathbin{\!/\mkern-5mu/\!}}
 \graphicspath{{pics/}}
+\usepackage{subfigure}
 %\newcommand{\mat}[1]{\bm{\mathit{#1}}}
 
 
@@ -360,6 +361,19 @@ As we know, the pictures taken by a camera is actually projections of Euclidean 
 	\item Apply the homography we get to all points in the picture space and get the rectified image.
 \end{enumerate}
 
+To validate our solution, we did several experiments using our four point rectification approach and get the following results, for every result we attached the original image by its side for convenience of comparison. 
+\begin{figure*}
+  \centering
+  \subfigure[Result Using Our Four Point Rectification Approach]{
+    \label{four-point-normal-1} %% label for first subfigure
+    \includegraphics[width=0.49\linewidth]{four-point-normal-1.jpeg}}
+  \subfigure[Result Using findHomography in OpenCV]{
+    \label{findhomo-1} %% label for second subfigure
+    \includegraphics[width=0.49\linewidth]{findhomo-1.jpeg}}
+  \caption{findHomograph vs. Our Approach for Picture 1}
+  \label{four-point-comparison-1} %% label for entire figure
+\end{figure*}
+
 
 \section{Affine rectification using parallelism}
 The key of using parallel lines in projective space to recover affine properties from images is the infinite line. In the affinity space, the infinite line is a fixed line $l_{\infty} = (0, 0, 1)^T$, however a projective transformation might maps $l_{\infty}$ from the fixed line at infinity to a finite line $l$ on the space after projection. Then, say we have the infinite line $l = (l_1, l_2, l_3)^T$ in a projective space, where $l_3\neq 0$, and the homography of this current projection $\mat{H}$ can be divided as:
@@ -404,6 +418,14 @@ Suppose we have four points $p_1, p_2, p_3, p_4$ and they form a rectangle simil
 \end{equation}
 
 \noindent According to our discussion above, now we can form a new matrix same as given in equation 10 based on the infinite line, and the new $\mat{H}_P$ can handle the transformation between the picture space and affinity.
+
+To summarize, the following steps are needed when we are doing the affine rectification:
+\begin{enumerate}
+	\item Find two physically parallel line pairs in the picture plane. (here we can simply use those points we picked for the rectangle in our first question, since those four apexes naturally provide two parallel line pairs)
+	\item Through those parallel lines we got, solve two intercepts of those parallel lines in picture plane, which are ideal points that should lie on the line of infinity in the world plane.
+	\item From the two ideal points we can now get line of infinity in the picture plane.
+	\item Since we know the coordinates of infinite line in the world plane, we can now solve the homography transformation from picture plane to affinity.
+\end{enumerate}
 
 \section{From Affinity to normal: a two step approach}
 Now that we have got the image $\mat{I}_A$ that is affinely rectified (1st step), we can further remove the affine distortion from it (step 2) through using $C_{\infty}^*$, basically to find the $\mat{H}_A$ in equation 9 so that:
