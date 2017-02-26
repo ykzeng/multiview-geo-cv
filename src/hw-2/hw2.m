@@ -1,7 +1,7 @@
 clc;close all; clear all;
 % read images
-fig_1 = imread('fig_1.jpg');
-fig_2 = imread('fig_2.jpg');
+fig_1 = imread('pics/fig_1.jpg');
+fig_2 = imread('pics/fig_2.jpg');
 % load point coordinates from pre-defined
 load('points.mat')
 x1 = x1';
@@ -14,39 +14,8 @@ y2 = y2';
 % get points from the second figure
 %[x2, y2] = getpts(get(imshow('fig_2.jpg'), 'Parent'));
 
-% build matrix for selected points in the first figure
-ptsSize1 = size(x1);
-ptsCount1 = ptsSize1(1);
-ptsSize2 = size(x2);
-ptsCount2 = ptsSize2(1);
-
-%X1 = ones(ptsCount1, 3);
-%for i = 1:ptsCount1
-%    X1(i, 1) = x1(i);
-%    X1(i, 2) = y1(i);
-%end
-
-% build matrix for selected points in the second figure
-%X2 = ones(ptsCount2, 3);
-%for i = 1:ptsCount2
-%    X2(i, 1) = x2(i);
-%    X2(i, 2) = y2(i);
-%end
-
-% build A matrix
-A = zeros(ptsCount1 * 2, 9);
-for i = 1:ptsCount1
-    A(2*i - 1, :) = [0 0 0 -x1(i) -y1(i) -1 (y2(i) * x1(i)) (y2(i)*y1(i)) y2(i)];
-    A(2*i, :) = [x1(i) y1(i) 1 0 0 0 (-x2(i)*x1(i)) (-x2(i)*y1(i)) (-x2(i))];
-end
-
-% singular value decomposition
-[U,S,V] = svd(A);
-V = V/V(9, 9);
-H_col = [V(1, 9), V(2, 9), V(3, 9);
-    V(4, 9), V(5, 9), V(6, 9);
-    V(7, 9), V(8, 9), V(9, 9);];
-
+% call function to get homography
+H_col = dltHomography(x1, y1, x2, y2);
 transform_col = projective2d(H_col');
 
 % get image reference info for fig_1 and transformed final figure 1
@@ -61,6 +30,72 @@ im_ref2 = imref2d(size(fig_2));
 image(final_composite);
 % write images to file
 %imwrite(final_col, 'dlt.jpg');
+
+% function that accepts input (x, y) coordinates vector from both image and
+% output the homography
+function H_col = dltHomography(x1, y1, x2, y2)
+    % build matrix for selected points in the first figure
+    ptsSize1 = size(x1);
+    ptsCount1 = ptsSize1(1);
+    ptsSize2 = size(x2);
+    ptsCount2 = ptsSize2(1);
+    
+    if(ptsCount1 ~= ptsCount2)
+        error('select same amount of points in two figures!');
+    end
+        
+    % build A matrix
+    A = zeros(ptsCount1 * 2, 9);
+    for i = 1:ptsCount1
+        A(2*i - 1, :) = [0 0 0 -x1(i) -y1(i) -1 (y2(i) * x1(i)) (y2(i)*y1(i)) y2(i)];
+        A(2*i, :) = [x1(i) y1(i) 1 0 0 0 (-x2(i)*x1(i)) (-x2(i)*y1(i)) (-x2(i))];
+    end
+
+    % singular value decomposition
+    [U,S,V] = svd(A);
+    V = V/V(9, 9);
+    H_col = [V(1, 9), V(2, 9), V(3, 9);
+        V(4, 9), V(5, 9), V(6, 9);
+        V(7, 9), V(8, 9), V(9, 9);];
+end
+
+% function for finding normalizing similarity homography
+% accepting x and y vector for a series of points, output the homography
+function H_norm =  normSimHomo(x, y)
+    if(~isvector(x) || ~isvector(y))
+        error('input param should be a vector of x and y coordinates!');
+    end
+    % compute the avg value of both x and y coordinates
+    % TODO: whether mean function can be applied to multi row vector like
+    % we have here
+    avg_x = mean(x);
+    avg_y = mean(y);
+    
+    % acquire number of points we have
+    ptsSize = size(x);
+    n = ptsSize(1);
+    
+    % calculate the sum of distance of every points to the centroid
+    dist_sum = 0;
+    for i = 1:n
+        dist_sum = dist_sum + sqrt((x(i, 1) - avg_x)^2 + (y(i, 1) - avg_y)^2);
+    end
+    avg_dist = dist_sum / n;
+    
+    % calculate diagonal element s in similarity homography
+    s = sqrt(2) / avg_dist;
+    t_x = -s * avg_x;
+    t_y = -s * avg_y;
+    
+    H_norm = [s 0 t_x;
+        0 s t_y;
+        0 0 1];
+end
+
+% function for applying homography point wise
+function applyHomoPerPt(x)
+    
+end
 
 % useless data
 %x1 = [2282.1985645933014; 2484.0526315789471; 2477.3241626794256; 2472.8385167464112; ...
