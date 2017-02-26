@@ -8,6 +8,19 @@ x1 = x1';
 x2 = x2';
 y1 = y1';
 y2 = y2';
+ptsSize1 = size(x1);
+ptsCount1 = ptsSize1(1);
+ptsSize2 = size(x2);
+ptsCount2 = ptsSize2(1);
+% notice we organize all the points here in the vector format (x, y, 1)
+X1 = ones(ptsCount1, 3);
+X2 = ones(ptsCount2, 3);
+
+X1(:, 1) = x1(:, 1);
+X1(:, 2) = y1(:, 1);
+
+X2(:, 1) = x2(:, 1);
+X2(:, 2) = y2(:, 1);
 % get points from the first figure
 %[x1, y1] = getpts(get(imshow('fig_1.jpg'),'Parent'));
 
@@ -15,25 +28,40 @@ y2 = y2';
 %[x2, y2] = getpts(get(imshow('fig_2.jpg'), 'Parent'));
 
 % call function to get homography
-H_col = dltHomography(x1, y1, x2, y2);
-transform_col = projective2d(H_col');
+H_dlt = dltHomography(X1, X2);
 
-% get image reference info for fig_1 and transformed final figure 1
-im_ref1 = imref2d(size(fig_1));
-[final_1, final_ref1] = imwarp(fig_1, im_ref1, transform_col);
-
-% image reference info for fig_2
-im_ref2 = imref2d(size(fig_2));
-
-% composite two images into one using image reference info
-[final_composite, final_composite_ref] = imfuse(final_1, final_ref1, fig_2, im_ref2);
-image(final_composite);
+% combine two imgs and show
+img_dlt_combined = twoImgHomoCombine(H_dlt', fig_1, fig_2);
+figure(1), image(img_dlt_combined);
 % write images to file
 %imwrite(final_col, 'dlt.jpg');
 
+% normalizing similarity homography for both images
+H_norm_1 = normSimHomo(X1);
+H_norm_2 = normSimHomo(X2);
+% apply normalization on our points
+X1_norm = applyHomoPerPt(H_norm_1, X1);
+X2_norm = applyHomoPerPt(H_norm_2, X2);
+% do DLT to get the normalized DLT homography
+H_dlt_norm = dltHomography(X1_norm, X2_norm);
+H_dlt_denorm = inv(H_norm_2) * H_dlt_norm * H_norm_1;
+img_dlt_norm_combined = twoImgHomoCombine(H_dlt_denorm', fig_1, fig_2);
+figure(2), image(img_dlt_norm_combined);
+
+function img_combined = twoImgHomoCombine(H, fig1, fig2)
+    transform = projective2d(H);
+    % get image reference info for fig_1 and transformed final figure 1
+    im_ref1 = imref2d(size(fig1));
+    % new reference of figure 1 after transformation
+    [im_trans1, im_trans_ref1] = imwarp(fig1, im_ref1, transform);
+    % image reference info for fig_2
+    im_ref2 = imref2d(size(fig2));
+    % overlap two images
+    [img_combined, img_combined_ref] = imfuse(im_trans1, im_trans_ref1, fig2, im_ref2);
+end
 % function that accepts input (x, y) coordinates vector from both image and
 % output the homography
-function H_col = dltHomography(x1, y1, x2, y2)
+function H_col = dltHomography(x1, x2)
     % build matrix for selected points in the first figure
     ptsSize1 = size(x1);
     ptsCount1 = ptsSize1(1);
@@ -47,8 +75,8 @@ function H_col = dltHomography(x1, y1, x2, y2)
     % build A matrix
     A = zeros(ptsCount1 * 2, 9);
     for i = 1:ptsCount1
-        A(2*i - 1, :) = [0 0 0 -x1(i) -y1(i) -1 (y2(i) * x1(i)) (y2(i)*y1(i)) y2(i)];
-        A(2*i, :) = [x1(i) y1(i) 1 0 0 0 (-x2(i)*x1(i)) (-x2(i)*y1(i)) (-x2(i))];
+        A(2*i - 1, :) = [0 0 0 -x1(i, 1) -x1(i, 2) -1 (x2(i, 2) * x1(i, 1)) (x2(i, 2) * x1(i, 2)) x2(i, 2)];
+        A(2*i, :) = [x1(i, 1) x1(i, 2) 1 0 0 0 (-x2(i, 1) * x1(i, 1)) (-x2(i, 1) * x1(i, 2)) (-x2(i, 1))];
     end
 
     % singular value decomposition
@@ -61,24 +89,21 @@ end
 
 % function for finding normalizing similarity homography
 % accepting x and y vector for a series of points, output the homography
-function H_norm =  normSimHomo(x, y)
-    if(~isvector(x) || ~isvector(y))
-        error('input param should be a vector of x and y coordinates!');
-    end
+function H_norm =  normSimHomo(X)
     % compute the avg value of both x and y coordinates
     % TODO: whether mean function can be applied to multi row vector like
     % we have here
-    avg_x = mean(x);
-    avg_y = mean(y);
+    avg_x = mean(X(:, 1));
+    avg_y = mean(X(:, 2));
     
     % acquire number of points we have
-    ptsSize = size(x);
+    ptsSize = size(X);
     n = ptsSize(1);
     
     % calculate the sum of distance of every points to the centroid
     dist_sum = 0;
     for i = 1:n
-        dist_sum = dist_sum + sqrt((x(i, 1) - avg_x)^2 + (y(i, 1) - avg_y)^2);
+        dist_sum = dist_sum + sqrt((X(i, 1) - avg_x)^2 + (X(i, 2) - avg_y)^2);
     end
     avg_dist = dist_sum / n;
     
@@ -93,8 +118,9 @@ function H_norm =  normSimHomo(x, y)
 end
 
 % function for applying homography point wise
-function applyHomoPerPt(x)
-    
+% by default we assume X=(x, y, 1) as a row
+function X_new = applyHomoPerPt(H, X)
+    X_new = (H * (X'))';
 end
 
 % useless data
