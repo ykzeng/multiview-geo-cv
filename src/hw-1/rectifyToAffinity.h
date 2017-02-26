@@ -133,6 +133,12 @@ void rectifyToAffinity(const Mat& imgOriginal, const CvMat* pts, CvMat* H_A, Mat
   cvCrossProduct(m1, m2, v2);
   cvCrossProduct(v1, v2, vanishLine);
 
+  cout << "vanish line: " << endl;
+  for (int i = 0; i < 3; i++)
+  {
+    cout << CV_MAT_ELEM(*vanishLine, double, 0, i) << " ";
+  }
+
   // idea from https://engineering.purdue.edu/kak/computervision/ECE661.08/solution/hw2_s2.pdf
   // normalize vanishing line
   // in order to map the distorted image back to the image window
@@ -152,6 +158,16 @@ void rectifyToAffinity(const Mat& imgOriginal, const CvMat* pts, CvMat* H_A, Mat
   cvmSet(H_A, 2, 0, cvmGet(vanishLine, 0, 0));
   cvmSet(H_A, 2, 1, cvmGet(vanishLine, 0, 1));
   cvmSet(H_A, 2, 2, cvmGet(vanishLine, 0, 2));
+
+  cout << "Homography back to affinity: " << endl;
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      cout << CV_MAT_ELEM(*H_A, double, i, j) << " ";
+    }
+    cout << endl;
+  }
 
   cv::warpPerspective(imgOriginal, imgOut, cvarrToMat(H_A), imgOriginal.size());
   cv::imwrite(".\\affinity.jpeg", imgOut);
@@ -307,53 +323,19 @@ void affinityToNormal(const Mat& imgOriginal, CvMat* pts, CvMat* H_A, Mat& resul
   CvMat H2 = cvMat(3, 3, CV_64FC1, H2data);
   CvMat *invH2 = cvCreateMat(3, 3, CV_64FC1);
   cvInvert(&H2, invH2);
+
+  cout << "H2: " << endl;
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      cout << CV_MAT_ELEM(H2, double, i, j) << " ";
+    }
+    cout << endl;
+  }
+
   cv::warpPerspective(imgOriginal, myOut, cvarrToMat(invH2), imgOriginal.size());
   cv::imwrite(".\\normal.jpeg", myOut);
-  //cvZero(check);
-  //for (int i = 0; i < imgOriginal.cols; i++) { //y - ver
-  //  for (int j = 0; j < imgOriginal.rows; j++) { //x - hor
-  //                              // set X_a
-  //    cvmSet(ptxp, 0, 0, (double)j);
-  //    cvmSet(ptxp, 1, 0, (double)i);
-  //    cvmSet(ptxp, 2, 0, 1.0);
-  //    // compute X
-  //    cvMatMul(invH2, ptxp, ptx);
-  //    curpi = CLIP2(0, height - 1, (int)(cvmGet(ptx, 1, 0) / cvmGet(ptx, 2, 0)));
-  //    curpj = CLIP2(0, width - 1, (int)(cvmGet(ptx, 0, 0) / cvmGet(ptx, 2, 0)));
-  //    cvSet2D(img_scene, curpi, curpj, cvGet2D(img_affine, i, j));
-  //    cvmSet(check, curpi, curpj, 1);
-  //  }
-  //}
-  //// output reconstructed scene image
-  //img_interp = cvCloneImage(img_scene);
-  //data_interp = (uchar *)img_interp->imageData;
-  ////interpolation
-  //for (i = 1; i<height - 1; i++) { //y - ver
-  //  for (j = 1; j<width - 1; j++) { //x - hor
-  //    if (cvmGet(check, i, j) == 0) {
-  //      count = (cvmGet(check, i -
-  //        1, j) == 1) + (cvmGet(check, i + 1, j) == 1) + (cvmGet(check, i, j -
-  //          1) == 1) + (cvmGet(check, i, j + 1) == 1);
-  //      if (count != 0) {
-  //        for (k = 0; k<channels; k++) {
-  //          data_interp[i*step + j*channels + k] =
-  //            (int)((data_scene[(i -
-  //              1)*step + j*channels + k] + data_scene[(i + 1)*step + j*channels + k] + data_scene[i*step + (j -
-  //                1)*channels + k] + data_scene[i*step + (j + 1)*channels + k]) / count);
-  //        }
-  //      }
-  //    }
-  //  }
-  //}
-  //if (!cvSaveImage("scene.jpg", img_interp))
-  //  printf("Could not save file\n");
-
-  //// release the image
-  //cvReleaseImage(&img_in);
-  //cvReleaseImage(&img_affine);
-  //cvReleaseImage(&img_scene);
-  //cvReleaseImage(&img_interp);
-  //return 0;
 }
 
 //==========================================================================================================
@@ -447,6 +429,16 @@ void fourPointRectify(const Mat& imgOriginal, Mat& standardOut, Mat& fourPOut) {
   cvmSet(my_cv_homo, 2, 2, 1);
 
   Mat my_homo = cvarrToMat(my_cv_homo);
+
+  cout << "Four point Homography: " << endl;
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      cout << CV_MAT_ELEM(*my_cv_homo, double, i, j) << " ";
+    }
+    cout << endl;
+  }
 
   cv::warpPerspective(imgOriginal, fourPOut, my_homo, imgOriginal.size());
 

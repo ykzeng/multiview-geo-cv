@@ -148,6 +148,7 @@
 \newcommand{\parallelsum}{\mathbin{\!/\mkern-5mu/\!}}
 \graphicspath{{pics/}}
 \usepackage{subfigure}
+
 %\newcommand{\mat}[1]{\bm{\mathit{#1}}}
 
 
@@ -179,11 +180,6 @@ Homework I}
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Yukun Zeng}
-\IEEEauthorblockA{Department of Computer Science and Engineering\\
-Texas A\&M University\\
-College Station, TX 77840\\
-Email: yzeng@tamu.edu}}
 
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
@@ -568,8 +564,59 @@ To validate the correctness of our approach, we did experiment on the picture 1 
 \end{figure*}
 
 \section{Important Results}
+\subsection{Problem I}
+In problem I, we have solved the homography using four apexes of the rectangle and get:
+\begin{equation}
+	\mat{H}_1=
+	\begin{pmatrix}
+		0.253003 & -0.0815367 & 554.457\\
+-0.121283 & 0.502774 & 236.837\\
+-0.000246957 & -5.84335e-05 & 1
+	\end{pmatrix}
+\end{equation}
+\subsection{Problem II}
+In problem II, the first and most important result we get is the vanishing line (line at infinity) at the picture plane, I solved it to be:
+\begin{equation}
+	\vec{l_\infty}=
+	\begin{pmatrix}
+		-8.46e+11 & -2.00e+11 & 3.42e+15
+	\end{pmatrix}
+\end{equation}
+And if we dehomogenize the line of infinity so that we can actully apply it into homography, we can get:
 
-\section{Discussions}
+After solving the line of infinity, we can get the homography from picture plane to affinity:
+\begin{equation}
+	\mat{H}_A=
+	\begin{pmatrix}
+		1 & 0 & 0\\
+		0 & 1 & 0\\
+		-0.000740871 & -0.0001753 & 3
+	\end{pmatrix}
+\end{equation}
+
+\subsection{Problem III}
+For problem III we can just transform the orthogonal lines back to affinity using $\mat{H}_A$ and then get the homography (from affinity to world plane) by using coordinates of orthogonal lines, the result of homography we get is:
+\begin{equation}
+	\mat{H}_2=
+	\begin{pmatrix}
+		0.953997 & -0.00396995 & 0\\
+		-0.00396995 & 0.999992 & 0\\
+		0 & 0 & 1
+	\end{pmatrix}
+\end{equation}
+
+Due to time and space limitations, we ignored some irrelevant and simple intermediate results like the coordinates of parallel or orthogonal lines.
+
+\section{Conclusion \& Discussions}
+As we have researched and implemented, all the methods above can successfully transform a distorted image from the picture plane back to the world plane (The unimplemented approach in our challenge also does the job). For me I think those approaches are actually using similar quantity of informations:
+\begin{itemize}
+	\item Problem 1: we used four known points that form a rectangle.
+	\item Problem 2: we used two pairs of parallel line to rectify the image back to affinity.
+	\item Problem 3: based on the same points (lines) we used in 2, we transform the picture from affinity to world plane.
+\end{itemize}
+Be noticed that problem 2 and problem 3 are actually combined together for us to get the image back from picture plane to world plane, and in the whole process the points we used are exactly the same with problem 1. Therefore, in reality though we have different approaches to rectify images but as long as the start plane and the target plane we want in the rectification is the same, we will need the same amount of information from the world planes (e.g., same amount of points, same amount of lines, etc). 
+
+And if we analyze the difference between the two step approch implemented in this paper and the challenge part (one-step approach), both of them can remove projective and affine distortions while preserving the similarity. The two-step approach should be more robust since in every step we only need to solve a 2D simultaneous linear function while the one-step approach is numerically unstable due to the need of solving 5 DoFs equations, which is also one of the reason I didn't succeed in it (it seems to rely a lot on the orthogonal line pairs we are choosing). Further questions may be resolved by email and the source code of all the questions is pushed to the Github repository: https://github.com/vincenttsang/multiview-geo-cv.
 % conference papers do not normally have an appendix
 
 
