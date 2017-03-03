@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/W32TeX) (preloaded format=pdflatex 2016.10.24)  13 FEB 2017 17:03
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/W32TeX) (preloaded format=pdflatex 2016.10.24)  14 FEB 2017 23:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -341,34 +341,63 @@ LaTeX Info: Thecontrolsequence`\]'isalreadyrobust on input line 129.
 \l_MT_below_intertext_sep=\dimen156
 \l_MT_above_shortintertext_sep=\dimen157
 \l_MT_below_shortintertext_sep=\dimen158
-) (./bare_conf.aux)
+)
+(c:/texlive/2016/texmf-dist/tex/latex/subfigure/subfigure.sty
+Package: subfigure 2002/03/15 v2.1.5 subfigure package
+\subfigtopskip=\skip61
+\subfigcapskip=\skip62
+\subfigcaptopadj=\dimen159
+\subfigbottomskip=\skip63
+\subfigcapmargin=\dimen160
+\subfiglabelskip=\skip64
+\c@subfigure=\count124
+\c@lofdepth=\count125
+\c@subtable=\count126
+\c@lotdepth=\count127
+
+****************************************
+* Local config file subfigure.cfg used *
+****************************************
+(c:/texlive/2016/texmf-dist/tex/latex/subfigure/subfigure.cfg)
+\subfig@top=\skip65
+\subfig@bottom=\skip66
+)
+(./bare_conf.aux
+
+LaTeX Warning: Label `hw1-wall-rec' multiply defined.
+
+
+LaTeX Warning: Label `sub@hw1-wall-rec' multiply defined.
+
+)
 \openout1 = `bare_conf.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 166.
-LaTeX Font Info:    ... okay on input line 166.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 166.
-LaTeX Font Info:    ... okay on input line 166.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 166.
-LaTeX Font Info:    ... okay on input line 166.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 166.
-LaTeX Font Info:    ... okay on input line 166.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 166.
-LaTeX Font Info:    ... okay on input line 166.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 166.
-LaTeX Font Info:    ... okay on input line 166.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 168.
+LaTeX Font Info:    ... okay on input line 168.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 168.
+LaTeX Font Info:    ... okay on input line 168.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 168.
+LaTeX Font Info:    ... okay on input line 168.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 168.
+LaTeX Font Info:    ... okay on input line 168.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 168.
+LaTeX Font Info:    ... okay on input line 168.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 168.
+LaTeX Font Info:    ... okay on input line 168.
+
 -- Lines per column: 56 (exact).
 (c:/texlive/2016/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count124
-\scratchdimen=\dimen159
+\scratchcounter=\count128
+\scratchdimen=\dimen161
 \scratchbox=\box32
-\nofMPsegments=\count125
-\nofMParguments=\count126
+\nofMPsegments=\count129
+\nofMParguments=\count130
 \everyMPshowfont=\toks31
-\MPscratchCnt=\count127
-\MPscratchDim=\dimen160
-\MPnumerator=\count128
-\makeMPintoPDFobject=\count129
+\MPscratchCnt=\count131
+\MPscratchDim=\dimen162
+\MPnumerator=\count132
+\makeMPintoPDFobject=\count133
 \everyMPtoPDFconversion=\toks32
 ) (c:/texlive/2016/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
 Package: pdftexcmds 2016/05/21 v0.22 Utility functions of pdfTeX for LuaTeX (HO
@@ -419,45 +448,104 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-LaTeX Font Info:    Try loading font information for U+msa on input line 242.
 
+LaTeX Warning: No \author given.
+
+
+LaTeX Warning: No \author given.
+
+
+LaTeX Warning: No \author given.
+
+LaTeX Font Info:    Try loading font information for U+msa on input line 239.
 (c:/texlive/2016/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 242.
+LaTeX Font Info:    Try loading font information for U+msb on input line 239.
 
 (c:/texlive/2016/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for U+lasy on input line 242.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 239.
 
 (c:/texlive/2016/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
 LaTeX Font Info:    Font shape `U/lasy/b/n' in size <7> not available
-(Font)              Font shape `U/lasy/m/n' tried instead on input line 242.
+(Font)              Font shape `U/lasy/m/n' tried instead on input line 239.
 LaTeX Font Info:    Font shape `U/lasy/b/n' in size <5> not available
-(Font)              Font shape `U/lasy/m/n' tried instead on input line 242.
+(Font)              Font shape `U/lasy/m/n' tried instead on input line 239.
 
-Underfull \hbox (badness 4531) in paragraph at lines 314--315
+Underfull \hbox (badness 4531) in paragraph at lines 311--312
 \OT1/ptm/m/n/10 Now, say we have four points whose co-or-di-nate in
  []
 
 
-Underfull \hbox (badness 4967) in paragraph at lines 314--315
+Underfull \hbox (badness 4967) in paragraph at lines 311--312
 \OT1/ptm/m/n/10 their cor-re-spond-ing co-or-di-nates in pro-jec-tive space is
  []
 
-[1{c:/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+<pics/findhomo-1.jpeg, id=1, 1882.03125pt x 1411.52344pt>
+File: pics/findhomo-1.jpeg Graphic file (type jpg)
+
+<use pics/findhomo-1.jpeg>
+Package pdftex.def Info: pics/findhomo-1.jpeg used on input line 365.
+(pdftex.def)             Requested size: 252.84283pt x 189.6213pt.
+
+<pics/four-point-normal-1.jpeg, id=2, 1882.03125pt x 1411.52344pt>
+File: pics/four-point-normal-1.jpeg Graphic file (type jpg)
+
+<use pics/four-point-normal-1.jpeg>
+Package pdftex.def Info: pics/four-point-normal-1.jpeg used on input line 368.
+(pdftex.def)             Requested size: 252.84283pt x 189.6213pt.
+
+<pics/hw1-wall-rec.jpeg, id=3, 1882.03125pt x 1411.52344pt>
+File: pics/hw1-wall-rec.jpeg Graphic file (type jpg)
+
+<use pics/hw1-wall-rec.jpeg>
+Package pdftex.def Info: pics/hw1-wall-rec.jpeg used on input line 371.
+(pdftex.def)             Requested size: 252.84283pt x 189.6213pt.
+ [1{c:/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
-]
-(./bare_conf.bbl [2]
-LaTeX Font Info:    Font shape `U/lasy/b/n' in size <8> not available
-(Font)              Font shape `U/lasy/m/n' tried instead on input line 72.
-LaTeX Font Info:    Font shape `U/lasy/b/n' in size <6> not available
-(Font)              Font shape `U/lasy/m/n' tried instead on input line 72.
-)
+] [2 <./pics/findhomo-1.jpeg> <./pics/four-point-normal-1.jpeg> <./pics/hw1-wal
+l-rec.jpeg>]
+<pics/affinity-wall-1.jpeg, id=22, 1882.03125pt x 1411.52344pt>
+File: pics/affinity-wall-1.jpeg Graphic file (type jpg)
+
+<use pics/affinity-wall-1.jpeg>
+Package pdftex.def Info: pics/affinity-wall-1.jpeg used on input line 434.
+(pdftex.def)             Requested size: 252.84283pt x 189.6213pt.
+
+<pics/affinity-floor-1.jpeg, id=23, 2509.375pt x 1882.03125pt>
+File: pics/affinity-floor-1.jpeg Graphic file (type jpg)
+
+<use pics/affinity-floor-1.jpeg>
+Package pdftex.def Info: pics/affinity-floor-1.jpeg used on input line 437.
+(pdftex.def)             Requested size: 252.84283pt x 189.6213pt.
+File: pics/hw1-wall-rec.jpeg Graphic file (type jpg)
+ <use pics/hw1-wall-rec.jpeg>
+Package pdftex.def Info: pics/hw1-wall-rec.jpeg used on input line 440.
+(pdftex.def)             Requested size: 252.84283pt x 189.6213pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 527--532
+
+ []
+
+<pics/two-floor-1.jpeg, id=24, 1882.03125pt x 1411.52344pt>
+File: pics/two-floor-1.jpeg Graphic file (type jpg)
+
+<use pics/two-floor-1.jpeg>
+Package pdftex.def Info: pics/two-floor-1.jpeg used on input line 558.
+(pdftex.def)             Requested size: 252.84283pt x 189.6213pt.
+
+<pics/hw1-floor-sqr.jpg, id=25, 1882.03125pt x 1411.52344pt>
+File: pics/hw1-floor-sqr.jpg Graphic file (type jpg)
+
+<use pics/hw1-floor-sqr.jpg>
+Package pdftex.def Info: pics/hw1-floor-sqr.jpg used on input line 561.
+(pdftex.def)             Requested size: 252.84283pt x 189.6213pt.
+ [3] [4 <./pics/affinity-wall-1.jpeg> <./pics/affinity-floor-1.jpeg>]
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -469,32 +557,36 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[3
+[5
 
-] (./bare_conf.aux) ) 
+ <./pics/two-floor-1.jpeg> <./pics/hw1-floor-sqr.jpg>] (./bare_conf.aux)
+
+LaTeX Warning: There were multiply-defined labels.
+
+ ) 
 Here is how much of TeX's memory you used:
- 4832 strings out of 493013
- 72050 string characters out of 6136992
- 155299 words of memory out of 5000000
- 8260 multiletter control sequences out of 15000+600000
- 42590 words of font info for 106 fonts, out of 8000000 for 9000
+ 4987 strings out of 493013
+ 74797 string characters out of 6136992
+ 158324 words of memory out of 5000000
+ 8419 multiletter control sequences out of 15000+600000
+ 35650 words of font info for 83 fonts, out of 8000000 for 9000
  1144 hyphenation exceptions out of 8191
- 40i,23n,26p,607b,358s stack positions out of 5000i,500n,10000p,200000b,80000s
-{c:/texlive/2016/texmf-dist/fonts/enc/dvips/base/8r.enc}<c
-:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><c:/texlive
-/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2016/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2016/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmmi7.pfb><c:/texlive/2016/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmr10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmr7.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/c
-msy10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
-<c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb><c:/texli
-ve/2016/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><c:/texlive/2016/texmf-dist
-/fonts/type1/urw/times/utmri8a.pfb>
-Output written on bare_conf.pdf (3 pages, 121025 bytes).
+ 40i,23n,26p,753b,279s stack positions out of 5000i,500n,10000p,200000b,80000s
+{c:/texlive/2016/texmf-dist/fonts/enc/dvips/base/8r.enc}<c:/texlive/2016/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><c:/texlive/2016/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2016/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmmi7.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmr10.pfb><c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb>
+<c:/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texli
+ve/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb><c:/texlive/2016/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb><c:/texlive/2016/texmf-dist/
+fonts/type1/urw/times/utmr8a.pfb><c:/texlive/2016/texmf-dist/fonts/type1/urw/ti
+mes/utmri8a.pfb>
+Output written on bare_conf.pdf (5 pages, 7469308 bytes).
 PDF statistics:
- 59 PDF objects out of 1000 (max. 8388607)
- 42 compressed objects within 1 object stream
+ 72 PDF objects out of 1000 (max. 8388607)
+ 46 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
