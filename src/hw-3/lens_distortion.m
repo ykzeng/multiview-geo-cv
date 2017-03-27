@@ -1,228 +1,120 @@
+clear all; close all; clc;
 single_fig = imread('pics/single.jpg');
 single_fig = rgb2gray(single_fig);
-figure, imshow(single_fig);
+figure(1); imshow(single_fig);
 hold on;
 
-% count all points used in the line
-pts_vertical = 10;
-pts_horizontal = 8;
-global pts_count;
-pts_count = pts_vertical + pts_horizontal;
-img_size = size(single_fig);
-% C contains matrix sorted by row 1 (x), we acquired ascending 1st col
-global C;
-C = get_corners(single_fig);
-% C_by_y contains points sorted by row 2 (y), we acquired ascending 2nd col
-global C_by_y;
-C_by_y = sortrows(C, 2);
+% get all corner points in the single checker board figure
+raw_corners = get_corners(single_fig);
 
-% global corner variable for storing all points (from perpendicular lines)
-% we wanna use in the error function
-global corners;
-corners = zeros(pts_count, 3);
-% put corner points on both perpendicular lines in corners matrix
-corners(1:10, 1:3) = C(1:10, 1:3);
-corners(11:18, 1:3) = C_by_y(5:12, 1:3);
+% draw all corner points on the figure
+% h = plot(raw_corners(:, 1), raw_corners(:, 2), 'x', 'Color', 'r', 'MarkerSize', 15);
+% set(h,'linewidth',3);
 
-global img_center;
-img_center = [img_size(1, 2) / 2, img_size(1, 1) / 2, 1];
+% corners sorted by x, 1st row
+s_corners_x = sortrows(raw_corners, 1);
+s_corners_y = sortrows(raw_corners, 2);
 
-% calculate the line of first column
-col_line = cross(C(1, :), C(10, :));
-% calculate the line of first row
-row_line = cross(C_by_y(12, :), C_by_y(5, :));
-% homogenize both lines
-col_line(1, :) = homogenize(col_line);
-row_line(1, :) = homogenize(row_line);
-
-% p matrix of points on first col, by calculating cross product
-global crossing_p;
-crossing_p = ones(pts_count, 3);
-% radius vector
-global r;
-% init radius vector
-r = zeros(pts_count, 1);
-% compute crossing_p for vertical line, 1st row
-for i = 1 : pts_vertical
-   % calculate the crossing point between line of first col and line from
-   % center of img to the measured corner point
-   tmp_line = cross(corners(i, :), img_center);
-   tmp_line = homogenize(tmp_line);
-   tmp_p = cross(col_line, tmp_line);
-   tmp_p = homogenize(tmp_p);
-   crossing_p(i, 1:3) = tmp_p;
-   
-   % calculate radius from each measured point to center of image
-   r(i) = sqrt((corners(i, 1) - img_center(1, 1))^2 + (corners(i, 2) - img_center(1, 2))^2);
-end
-
-for i = pts_vertical + 1 : pts_count
-   % calculate the crossing point between line of first col and line from
-   % center of img to the measured corner point
-   tmp_line = cross(corners(i, :), img_center);
-   tmp_line = homogenize(tmp_line);
-   tmp_p = cross(row_line, tmp_line);
-   tmp_p = homogenize(tmp_p);
-   crossing_p(i, 1:3) = tmp_p;
-   
-   % calculate radius from each measured point to center of image
-   r(i) = sqrt((corners(i, 1) - img_center(1, 1))^2 + (corners(i, 2) - img_center(1, 2))^2);
-end
-
-% nonlin method
-%k = [0.05, 0.025, 0, 0];
-%error_init = err_function(k);
-%k = lsqnonlin(@err_function, k);
-%error_final = err_function(k);
-
-%h = plot(C(:, 1), C(:, 2), 'x', 'MarkerSize', 15);
+% change this for new image
+% get desired horizotal points and vertical points
+vPts = s_corners_x(1:10, :);
+hPts = s_corners_y(5:12, :);
+% show all corner points on img
+%h = plot(hPts(:, 1), hPts(:, 2), 'x', 'Color', 'r', 'MarkerSize', 15);
+%set(h,'linewidth',3);
+%h = plot(vPts(:, 1), vPts(:, 2), 'x', 'Color', 'b', 'MarkerSize', 15);
 %set(h,'linewidth',3);
 
-% LM method
-k = [0.05, 0.025];
-error_init = err_function(k);
+% change this for new image
+% compute count of vertical and horizontal points
+global vPtsCount hPtsCount;
+vPtsCount = 10 - 1 + 1;
+hPtsCount = 12 - 5 + 1;
+
+% compute horizontal line and vertical line
+% use the first point and the last point
+vLine = cross(vPts(1, :), vPts(vPtsCount, :));
+hLine = cross(hPts(1, :), hPts(hPtsCount, :));
+% normalize
+vLine = [vLine(1)/vLine(3), vLine(2)/vLine(3), 1];
+hLine = [hLine(1)/hLine(3), hLine(2)/hLine(3), 1];
+
+% test if the line is correct
+%tmp = vPts(10, :) * (vLine');
+%tmp = hPts(1, :) * (hLine');
+global x_c y_c;
+[y_c, x_c] = size(single_fig);
+x_c = x_c / 2;
+y_c = y_c / 2;
+img_center = [x_c, y_c, 1];
+
+center2V = [];
+center2H = [];
+% compute lines from center to points on vertical or horizontal line
+for i = 1 : vPtsCount
+   tmpLine = cross(img_center, vPts(i, :));
+   % draw line between img center and vertical points
+   %line([img_center(1), vPts(i, 1)], [img_center(2), vPts(i, 2)]);
+   % normalize
+   tmpLine = [tmpLine(1)/tmpLine(3), tmpLine(2)/tmpLine(3), 1];
+   center2V = [center2V; tmpLine];
+end
+for i = 1 : hPtsCount
+   tmpLine = cross(img_center, hPts(i, :));
+   % draw line between img center and horizontal points
+   %line([img_center(1), hPts(i, 1)], [img_center(2), hPts(i, 2)]);
+   % normalie
+   tmpLine = [tmpLine(1)/tmpLine(3), tmpLine(2)/tmpLine(3), 1];
+   center2H = [center2H; tmpLine];
+end
+% compute interceptions
+v_inter = [];
+h_inter = [];
+for i = 1 : vPtsCount
+   tmpPt = cross(center2V(i, :), vLine(1, :));
+   tmpPt = [tmpPt(1)/tmpPt(3), tmpPt(2)/tmpPt(3), 1];
+   v_inter = [v_inter; tmpPt];
+end
+for i = 1 : hPtsCount
+   tmpPt = cross(center2H(i, :), hLine(1, :));
+   tmpPt = [tmpPt(1)/tmpPt(3), tmpPt(2)/tmpPt(3), 1];
+   h_inter = [h_inter; tmpPt];
+end
+% construct matrix containing all measured point x-y coordinates, from 
+% vertical to horizontal
+global measuredPts;
+measuredPts = [];
+% geometric distance from measurements to img center
+global dist2center;
+dist2center = [];
+for i = 1 : vPtsCount
+    measuredPts = [measuredPts; vPts(i, 1:2)];
+    tmpDist = sqrt((vPts(i, 1) - x_c)^2 + (vPts(i, 2) - y_c)^2);
+    dist2center = [dist2center; tmpDist];
+end
+for i = 1 : hPtsCount
+    measuredPts = [measuredPts; hPts(i, 1:2)];
+    tmpDist = sqrt((hPts(i, 1) - x_c)^2 + (hPts(i, 2) - y_c)^2);
+    dist2center = [dist2center; tmpDist];
+end
+% construct matrix containing all interception correspondence
+global interPts;
+interPts = [];
+for i = 1 : vPtsCount
+    interPts = [interPts; v_inter(i, 1:2)];
+end
+for i = 1 : hPtsCount
+    interPts = [interPts; h_inter(i, 1:2)];
+end
+global err;
+err = 0;
+k = [0.05, 0.025, 0.005];
+dev_init = err_func(k);
+
 options = optimset('Algorithm', 'levenberg-marquardt', 'Tolfun', 1e-8);
-kfinal = lsqnonlin(@err_function, k, [], [], options);
+kfinal = lsqnonlin(@err_func, k, [], [], options);
+dev_final = err_func(kfinal);
 
-x_0 = img_center(1, 1);
-y_0 = img_center(1, 2);
-undistort_img = undistortimage(single_fig, 1, x_0, y_0, k(1), k(2), 0, 0, 0, 0);
-
-error_final = err_function(kfinal);
-figure, imshow(undistort_img);
-
-% to do this function, make sure:
-% 1. pts_count is total points we have
-% 2. r contains the radius from image center for all pts_count points
-% 3. C contains all coordinates of pts_count points
-% 4. crossing_p the crossing point of two lines
-% 5. img_center center coordinates for img
-function [xy_error] = err_function(k)
-    global r;
-    global pts_count;
-    global img_center;
-    global crossing_p;
-    global corners;
-    x_0 = img_center(1, 1);
-    y_0 = img_center(1, 2);
-    error = zeros(pts_count, 1);
-    xy_error = zeros(pts_count*2, 1);
-    for i = 1 : pts_count
-       L = 1 + k(1) * r(i) + k(2) * r(i)^2; %+ k(3) * r(i)^3 + k(4) * r(i)^4;
-       x_hat = x_0 + L * (corners(i, 1) - x_0);
-       y_hat = y_0 + L * (corners(i, 2) - y_0);
-       % are we using crossing point or the original coordinates in the img
-       x_error = x_hat - crossing_p(i, 1);
-       y_error = (y_hat - crossing_p(i, 2));
-       xy_error(2*i - 1) = x_error;
-       xy_error(2*i) = y_error;
-       error(i) = sqrt(x_error^2 + y_error^2);
-    end
-end
-
-function vec = homogenize(vec)
-    vec(1, 1) = vec(1, 1) / vec(1, 3);
-    vec(1, 2) = vec(1, 2) / vec(1, 3);
-    vec(1, 3) = 1;
-end
-
-function corners = get_corners(fig)
-    tmp_corner = corner(fig);
-    corners = sortrows(tmp_corner);
-    corner_size = size(corners);
-    corner_m = corner_size(1);
-    corners(:, 3:3) = ones(corner_m, 1);
-end
-
-% UNDISTORTIMAGE - Removes lens distortion from an image
-%
-% Usage:  nim = undistortimage(im, f, ppx, ppy, k1, k2, k3, p1, p2)
-%
-% Arguments: 
-%           im - Image to be corrected.
-%            f - Focal length in terms of pixel units 
-%                (focal_length_mm/pixel_size_mm)
-%     ppx, ppy - Principal point location in pixels.
-%   k1, k2, k3 - Radial lens distortion parameters.
-%       p1, p2 - Tangential lens distortion parameters.
-%
-% Returns:  
-%          nim - Corrected image.
-%
-%  It is assumed that radial and tangential distortion parameters are
-%  computed/defined with respect to normalised image coordinates corresponding
-%  to an image plane 1 unit from the projection centre.  This is why the
-%  focal length is required.
-
-% Copyright (c) 2010 Peter Kovesi
-% Centre for Exploration Targeting
-% The University of Western Australia
-% peter.kovesi at uwa edu au
-% 
-% Permission is hereby granted, free of charge, to any person obtaining a copy
-% of this software and associated documentation files (the "Software"), to deal
-% in the Software without restriction, subject to the following conditions:
-% 
-% The above copyright notice and this permission notice shall be included in 
-% all copies or substantial portions of the Software.
-%
-% The Software is provided "as is", without warranty of any kind.
-
-% October   2010  Original version
-% November  2010  Bilinear interpolation + corrections
-% April     2015  Cleaned up and speeded up via use of interp2
-% September 2015  Incorporated k3 + tangential distortion parameters
-
-function nim = undistortimage(im, f, ppx, ppy, k1, k2, k3, k4, p1, p2)
-    
-    % Strategy: Generate a grid of coordinate values corresponding to an ideal
-    % undistorted image.  We then apply the imaging process to these
-    % coordinates, including lens distortion, to obtain the actual distorted
-    % image locations.  In this process these distorted image coordinates end up
-    % being stored in a matrix that is indexed via the original ideal,
-    % undistorted coords.  Thus for every undistorted pixel location we can
-    % determine the location in the distorted image that we should map the grey
-    % value from.
-
-    % Start off generating a grid of ideal values in the undistorted image.
-    [rows,cols,chan] = size(im);        
-    [xu,yu] = meshgrid(1:cols, 1:rows);
-    
-    % Convert grid values to normalised values with the origin at the principal
-    % point.  Dividing pixel coordinates by the focal length (defined in pixels)
-    % gives us normalised coords corresponding to z = 1
-    x = (xu-ppx)/f;
-    y = (yu-ppy)/f;    
-
-    % Radial lens distortion component
-    r2 = sqrt(x.^2+y.^2);                    % Squared normalized radius.
-    dr = k1*r2 + k2*r2.^2;% + k3*r2.^3 + k4*r2.^4;  % Distortion scaling factor.
-    
-    % Tangential distortion component (Beware of different p1,p2
-    % orderings used in the literature)
-    dtx =    2*p1*x.*y      +  p2*(r2 + 2*x.^2);
-    dty = p1*(r2 + 2*y.^2)  +    2*p2*x.*y;    
-    
-    % Apply the radial and tangential distortion components to x and y
-    x = x + dr.*x + dtx;
-    y = y + dr.*y + dty;
-    
-    % Now rescale by f and add the principal point back to get distorted x
-    % and y coordinates
-    xd = x*f + ppx;
-    yd = y*f + ppy;
-    
-    % Interpolate values from distorted image to their ideal locations
-    if ndims(im) == 2   % Greyscale
-        nim = interp2(xu,yu,double(im),xd,yd); 
-    else % Colour
-        nim = zeros(size(im));
-        for n = 1:chan
-            nim(:,:,n) = interp2(xu,yu,double(im(:,:,n)),xd,yd); 
-        end
-    end
-
-    if isa(im, 'uint8')      % Cast back to uint8 if needed
-        nim = uint8(nim);
-    end
-end
+% lens distortion correction
+undistorted_img = undistortimage(single_fig, 1, x_c, y_c, kfinal(1), kfinal(2), kfinal(3), 0, 0, 0);
+figure(2); imshow(undistorted_img); hold on;
