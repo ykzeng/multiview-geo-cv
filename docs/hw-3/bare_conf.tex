@@ -235,9 +235,6 @@ Project II}
 
 % make the title area
 \maketitle
-\begin{abstract}
-In this project, we explore and investigate different approaches for estimation in 2D projective transformation. In total, we implemented 3 approaches for finding the homography transformation between two different images, Direct Linear Transformation (DLT), normalized DLT and DLT with Sampson error minimization. This paper mainly focuses on the mathematical foundations for those methodologies used in our implementation and presents the results through combining two images into one panorama to validate the correctness of our approach. We can see clearly that with the advancement of our approach, the sampson error is gradually reduced (though there are few differences we can notice between those image panorama results).
-\end{abstract}
 % As a general rule, do not put math, special symbols or citations
 % in the abstract
 
@@ -321,6 +318,40 @@ The intuition behind this is that typically we choose higher order of distortion
 
 \subsection{Distortion function minimization}
 Similar as the minimization process we have done in the previous projects, here we need to minimize the geometric distance between predicted coordinates (by using $L(r)$) and measured coordinates. This can be done by exploiting the colinearity of points on the same line. In our project, we use the checker board image captured by our camera for lens distortion correction. The basic idea is that we can easily identify corner points on checker board and they naturally form parallel and perpendicular lines. If we determine a straight line using two corner points on the line, then all the other corner points along the line should be on the line if without radial distortion. Let's consider a simple scenario, suppose we have $\mat{A}, \mat{B}, \mat{D}$ on same line of a checker board, and the image center is $\mat{C}$, then we can do cross product to solve the crossing product of $\vec{AB}$ and $\vec{CD}$ to get $\mat{D}^{\prime} = \vec{AB}\times \vec{CD}$, due to the radial distortion we have $\mat{D} \neq \mat{D}^\prime$. If we apply $L(r)$ for the measured $D$ to get corrected coordinates $\hat{\mat{D}}$, we want to find a function that minimizes $d(\hat{\mat{D}}, \mat{D}^\prime)$. This is now reduced to a simple minimization problem of geometric distance like we did before, we can construct the corresponding error function based on discussions above and use non linear solver in MATLAB to get function $L(r)$ that does the required minimization.
+
+\subsection{Experiment Results}
+To evaluate the performance of our approach, we started an experiment. We fixed the focal length of our camera by turning off the auto focus function and stick a checker board on the wall as the object we use for calibration, the original colored photo we get from the camera is shown in Figure \ref{single}.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{single.jpg} 
+\end{center}	   
+\caption{The original colored picture we used for lens undistortion}\label{single}
+\end{figure}
+
+Then we grayize the photo and then use corner function provided by MATLAB to find out the corner points, the result we got from here is shown in Figure \ref{p_choice}. We then do the following steps:
+\begin{itemize}
+	\item Specify two perpendicular lines we want to use for this calibration.
+	\item Identify all the corner points from the image.
+	\item Compute the line through cross product of two end points.
+	\item Compute the lines from image center to each point on those perpendicular lines, we call them lines to center.
+	\item Use cross product to calculate the interceptions between two perpendicular lines and lines to center.
+	\item Now we can calculate geometric distance between interceptions and measured points, we further assume $L(r) = 1 + k_1r + k_2r^2$ and use \emph{lsqnonlin} with LM option to get the $k$ that minimizes the geometric distance.
+	\item After solving $L(r)$ function, we use a function for undistorting image which leverages the $L(r)$ function to remove the distortion of image.
+\end{itemize}
+The result after removing the distortion is also provided in Figure \ref{undistorted}. Notice that though there is no significant different between two images due to the fact that there are few radial distortion in our camera lens, we refer readers to display the original undistorted image and compare it to the original one, we can still notice changes this way.
+\begin{figure*}[!hbpt]
+  \subfigure[Grayized image with corner markers]{
+\label{p_choice} %% label for second subfigure
+\includegraphics[width=0.49\linewidth]{marked_orig.png}}
+ \subfigure[The image after removing lens distortion]{
+    \label{undistorted} %% label for first subfigure
+    \includegraphics[width=0.49\linewidth]{undistorted.jpg}}
+  \caption{Remove lens distortion}
+  \label{remove_distort} %% label for entire figure
+\end{figure*}
+
+
 %\begin{figure*}[!hbpt]
 %  \subfigure[Original source image(the image we wanna transform)]{
 %\label{fig1} %% label for second subfigure
@@ -340,7 +371,7 @@ Similar as the minimization process we have done in the previous projects, here 
 %\end{figure}
 
 \section{Camera Calibration}
-Recall from projects before, we have implemented DLT approach for finding the transformation homography from one image to another. Now in the camera calibration process, we can use similar methods, let's first review the original DLT approach and normalization process. 
+Recall from projects before, we have implemented DLT approach for finding the transformation homography from one image to another. Now in the camera calibration process, we can use similar methods, let's first adapt the original DLT approach and normalization process to camera calibration. 
 \subsection{DLT Foundation}
 In the simplest DLT approach, we first transform the homogeneous equation given in equation 7 as follows:
 \begin{equation}
@@ -429,8 +460,33 @@ Now we have come to the point that is very similar to what we have done before i
 \subsection{Normalized DLT}
 \subsubsection{2D Image Frame Normalization}
 Similar to the DLT part we did in finding transformation homography between two images, it's sometimes very important to carry out coordinates normalization to provide better homography (camera matrix in current case). $\mat{x}_i$ is in the same dimension as before, thus we can normalize it using previous method, i.e., the points should be translated so that centroid of all points is at the origin and we also need to scale them so that their RMS (root-mean-squared) distance from origin is $\sqrt{2}$. 
+As we have talked and implemented in the project before, the normalization process for 2D space can be summarized as follows:
+\begin{itemize}
+	\item Compute a similarity transformation $\mat{T}$, consisting of a translation and scaling that maps $\mat{x}_i$ to $\bar{\mat{x}}_i$ such that the centroid of all points $\bar{\mat{x}_i}$ is the coordinate origin $(0, 0)^T$ and their average distance from the origin is $\sqrt{2}$.
+	\item Compute a similar transformation $\mat{T}^\prime$ using the same process to map $\mat{x}_i^\prime$ to $\bar{\mat{x}}_i^\prime$.
+	\item Apply simple DLT in Problem 1 using the new corresponding point pairs $\bar{\mat{x}}_i\leftrightarrow \bar{\mat{x}}_i^\prime$ to obtain the normalized homography $\bar{\mat{H}}$
+	\item Use $\mat{H} = {\mat{T}^\prime}^{-1}\bar{\mat{H}}\mat{T}$ to denormalize the homography from last step and get the actual homography.
+\end{itemize}
+
 \subsubsection{3D World Frame Normalization}
-However, with the introduction of points in world frame, we now have to consider the 3D points $\mat{X}_i$. To simplify the problem, here we consider the case where the variation in point depth from the camera is relatively slight we can do similar normalization for 3D points as we did for 2D points. Therefore, we translate centroid of all measured points to the origin and scale their coordinates so that RMS distance from the origin is $\sqrt{3}$. As mentioned in the textbook, such 2D-alike approach is actually suitable for a compact distribution of points.
+However, with the introduction of points in world frame, we now have to consider the 3D points $\mat{X}_i$. To simplify the problem, here we consider the case where the variation in point depth from the camera is relatively slight we can do similar normalization for 3D points as we did for 2D points. Therefore, we translate centroid of all measured points to the origin and scale their coordinates so that RMS distance from the origin is $\sqrt{3}$. As mentioned in the textbook, such 2D-alike approach is actually suitable for a compact distribution of points. 
+With few changes, we can build the 3D process of normalization as follows:
+\begin{itemize}
+	\item Compute a similarity transformation $\mat{T}$, consisting of a translation and scaling that maps $\mat{X}_i$ to $\bar{\mat{X}}_i$ such that the centroid of all points $\bar{\mat{X}_i}$ is the coordinate origin $(0, 0, 0)^T$ and their average distance from the origin is $\sqrt{3}$, notice that here $\mat{X}_i$ and $\bar{\mat{X}}_i$ are in 3D space.
+	\item Compute a similar transformation $\mat{T}^\prime$ using the same process to map $\mat{X}_i^\prime$ to $\bar{\mat{X}}_i^\prime$.
+	\item Apply simple DLT using the new corresponding point pairs $\bar{\mat{X}}_i\leftrightarrow \bar{\mat{X}}_i^\prime$ to obtain the normalized homography $\bar{\mat{H}}$
+	\item Use $\mat{H} = {\mat{T}^\prime}^{-1}\bar{\mat{H}}\mat{T}$ to denormalize the homography from last step and get the actual homography.
+\end{itemize}
+
+\subsection{Build World Coordinate System}
+As we showed in the above sections, the greatest different in applying DLT into camera calibration is that we are now mapping points from 3D world space to 2D image space, i.e., we will have $\mat{X}_i$ to be 4D (3 dimensions for coordinates, 1 for homogenization). In the previous DLT we implemented, both $\mat{x}_i$ and $\mat{x}_i^\prime$ are selected from actual measurements and they are all in 2D (3D after homogenization) space. In our case for this project, we already have the 2D image space measurements while the real-world point locations cannot be obtained directly. Therefore, we introduce our definition of a world coordinate system here in order to obtain corresponding world coordinates for every points on the image. As shown in Figure \ref{world_sys}, we use the baseline of the left checker board (lowest line that goes through edge of black ceils) as the x-axis, the baseline of right checker board as y-axis, and the intersection line between two checker boards as the z-axis.
+\begin{figure*}
+  \label{world_sys}
+  \centering \includegraphics{world_sys.png}
+  \caption{Establishing the World Coordinate System}
+\end{figure*}
+
+We still need more information after the coordinate system is established, we need a well-defined distance metric for the world frame. Here we have measured the edge length of both black ceils and white ceils to be 24.5 mm, the distance between z-axis and right most black ceil edges on left checker board to be 21 mm, the distance between z-axis and left mots black ceil edges on right checker board to be 23.5 mm. Be noticed that we don't necessarily need a unified unit like mm when building the system, we just need to make sure the distance we assigned through the system is proportional to the actual distance. Now we have built a solid world frame coordinate system and apparently through the measurements of distance above, we can compute the real-world coordinates of every corner points in the image. To ensure the correspondence of real-world coordinates and coordinates in the image, we have to do some sorting algorithms on corner points and follow the same sequence while obtaining coordinates in both spaces, we skipped the details in doing this and we welcome readers to find out through codes attached in appendix.
 
 \subsection{Camera Calibration Steps}
 According to the textbook, the camera calibration steps can be carried out as shown in Figure \ref{calibrate_gold}.
@@ -440,10 +496,136 @@ According to the textbook, the camera calibration steps can be carried out as sh
   \caption{Algorithm of Camera Calibration using Gold Standard}
 \end{figure*}
 
-%\newpage
-%\appendix
-%\subsection{Main Entry}
-%\lstinputlisting{codes/hw2.m}
+After performing all those steps we can get the calibration results. Since we have lots of noise points in the previous image we are using, here we apply another image for the camera calibration process, and the calibrated pictures are shown in Figure \ref{cam_cali}.
+\begin{figure*}[!hbpt]
+  \subfigure[Point choice in the new image]{
+\label{pchoice-2nd} %% label for second subfigure
+\includegraphics[width=0.49\linewidth]{two_mark_orig.png}}
+ \subfigure[Point after calibration]{
+    \label{p_after_cali} %% label for first subfigure
+    \includegraphics[width=0.49\linewidth]{calibrated_red.png}}
+\subfigure[Correspondences of point after calibration and before]{
+    \label{p_cali_combine} %% label for first subfigure
+    \includegraphics[width=0.49\linewidth]{calibrated_combine.png}}
+  \caption{Camera Calibration Results}
+  \label{cam_cali} %% label for entire figure
+\end{figure*}
+
+Be noticed that in the result figure, points that are marked blue in Figure \ref{pchoice-2nd} are all the corner points for calibration, red points in Figure \ref{p_after_cali} are the calibrated points. And we show the overlapped calibrated results with original point choices in Figure \ref{p_cali_combine}. If we zoom in the picture we can see the little geometric distance from calibrated result points to original point, however the variances between them are still trivial.
+
+\section{Test Calibration Result}
+The purpose of this section is to evaluate the result of our calibration. We followed the procedure in project requirements, that is, we used a coin and place it in the center of 10 different white ceils for taking the photo. Then we select the object positions in the image and record its coordinates (should be the center of white ceil that it was in). Through applying the $\mat{P}$ matrix, we can get the theoretical coordinates of the actual point into the camera frame $\mat{x} = \mat{X}\mat{P}$ and compare it with the coordinates we recorded to compute errors and variances. Two examples of images we choose after placing the coins can be found in Figure \ref{samples}. The calibration resulted errors and variances is presented in the section of Report Requirements. As the code for doing calibration is the same with section before, the only codes needed here is to read new points on new images, sum and average the errors and variances.
+\begin{figure*}[!hbpt]
+  \subfigure[Sample 1]{
+\label{sample1} %% label for second subfigure
+\includegraphics[width=0.49\linewidth]{sample1.jpg}}
+ \subfigure[Sample 2]{
+    \label{sample2} %% label for first subfigure
+    \includegraphics[width=0.49\linewidth]{sample1.jpg}}
+  \caption{Sample images we took for testing calibration}
+  \label{samples} %% label for entire figure
+\end{figure*}
+
+\section{Toolbox result comparison}
+The toolbox usage for camera calibration can be summarized as follows:
+\begin{itemize}
+	\item Installation
+	\begin{itemize}
+		\item Download all files from the website.
+		\item Extract the compressed folder to certain directory and add this directory to MATLAB PATH variable.
+		\item Input command \emph{calib_gui} in MATLAB to open the toolbox.
+	\end{itemize}
+	\item Corner Detection
+\end{itemize}
+
+
+\section{Report requirement}
+\begin{itemize}
+	\item Set of points used for lens distortion calibration (superimpose your points on top of your calibration object.): the set of points used for lens distortion is provided in Appendix.
+	\item Lens distortion parameter sets and model (what is the order of the polynomial? how do you decide to omit high order terms?): as mentioned before in Section I, typically we choose the distortion param and model with consideration of the degree of radial distortion generated by lens. With more severe distortion, we need to use higher order Tyler expansion as $L(r)$ function. However, in our case, the radial distortion of our camera is very slight, thus we choose to use the typical 2 order expansion. We also provided results of using higher order (3 and 4 order) Tyler expansion function in the appendix, however the final images using those functions with different orders look the same.
+	\item Images before and after correcting the lens distortion: all the required images are provided in Section I.
+	\item Set of points used for camera calibration (superimpose your points on top of your calibration object.): Please refer to Figure \ref{pchoice-2nd} for the super imposed point choice, however since we have too many point choices we skipped all the coordinates of those points here.
+	\item Math about calibration process: shown in Section II.
+	\item Matrix P's from both the your calibration algorithm and matlab toolbox: 
+	\item Results from testing objects, point positions (measured vs. those computed from P), mean error and variance in image coordinate system: the mean error we get in testing objects is: $8.003623$ while the variance we got is $13.145783$. (This is the actual best results we got, and the results really do vary a lot with different image input in different lighting conditions).
+	\item Discussion about what you learn from the process.
+\end{itemize}
+\section{Discussion}
+As we mentioned before, typically we choose the distortion param and model with consideration of the degree of radial distortion generated by lens. With more severe distortion, we need to use higher order Tyler expansion as $L(r)$ function. However, in our case, the radial distortion of our camera is very slight, thus we choose to use the typical 2 order expansion. To achieve a better accuracy in corner detection (especially in terms of the sequence for our program to recognize corners), we have to ensure that the photo is taken under good illumination and we'd better hold the camera horizotally parallel to ground so that the x/y coordinates of points on the same line remain the same to avoid further processing in the code. In the first time when I took photos, I choosed a relatively complex environment, and the other useless stuffs showed in the images are recognized as corners, which also poses increasing difficulty in processing image. We also learnt that the modern camera can already provide good photos as they have few lens distortions.
+
+I would like to thank every classmates for their kindly help for me in this project, and several friends of mine who set up the environment for taking photos with me. Also, I will not to be able to finish the last problem without the kindly extension from Prof. Song.
+\onecolumn
+
+\section{Intermediate Results}
+\subsection{Lens Distortion}
+The intercept points we solved by cross product lines to center and row/column lines are shown as follows:
+\begin{equation}
+	\mat{I} = \left(\begin{array}{ccc} 73.0 & 101.0 & 1.0\\ 73.41 & 144.4 & 1.0\\ 73.88 & 192.9 & 1.0\\ 74.29 & 236.6 & 1.0\\ 74.76 & 286.0 & 1.0\\ 75.19 & 331.1 & 1.0\\ 75.66 & 380.1 & 1.0\\ 76.09 & 424.9 & 1.0\\ 76.56 & 474.5 & 1.0\\ 77.0 & 521.0 & 1.0\\ 396.0 & 95.0 & 1.0\\ 352.1 & 95.82 & 1.0\\ 303.1 & 96.73 & 1.0\\ 259.0 & 97.54 & 1.0\\ 209.9 & 98.46 & 1.0\\ 117.1 & 100.2 & 1.0\\ 165.8 & 99.28 & 1.0\\ 73.0 & 101.0 & 1.0 \end{array}\right)
+\end{equation}
+
+The actual measurements we get directly from the image (Set of points used for lens distortion calibration), they are also superimposed in Figure \ref{p_choice}:
+\begin{equation}
+	\mat{M} = \left(\begin{array}{ccc} 73.0 & 101.0 & 1.0\\ 74.0 & 145.0 & 1.0\\ 74.0 & 193.0 & 1.0\\ 75.0 & 237.0 & 1.0\\ 75.0 & 286.0 & 1.0\\ 76.0 & 331.0 & 1.0\\ 76.0 & 380.0 & 1.0\\ 76.0 & 425.0 & 1.0\\ 76.0 & 475.0 & 1.0\\ 77.0 & 521.0 & 1.0\\ 396.0 & 95.0 & 1.0\\ 352.0 & 96.0 & 1.0\\ 303.0 & 97.0 & 1.0\\ 259.0 & 98.0 & 1.0\\ 210.0 & 99.0 & 1.0\\ 117.0 & 100.0 & 1.0\\ 166.0 & 100.0 & 1.0\\ 73.0 & 101.0 & 1.0 \end{array}\right)
+\end{equation}
+
+We init $k$ in function $L(r)$ as follows and use minimization by LM to get $k_{final}$ as follows:
+\begin{equation}
+\begin{split}
+	k_{init} &= \left(\begin{array}{cc} 0.05 & 0.025 \end{array}\right)\\
+	k_{final} &= \left(\begin{array}{cc} 3.579\cdot 10^{-5} & -1.32\cdot 10^{-7} \end{array}\right)
+\end{split}
+\end{equation}
+The $k$ we obtained through 3 order $L(r)$ function:
+\begin{equation}
+	\begin{split}
+		k_{init} &= \left(\begin{array}{ccc} 0.05 & 0.025 & 0.005 \end{array}\right)\\
+		k_{final} &= \left(\begin{array}{ccc} 7.351\cdot 10^{-5} & -4.636\cdot 10^{-7} & 7.15\cdot 10^{-10} \end{array}\right)
+	\end{split}
+\end{equation}
+
+\subsection{Camera Calibration}
+The $\mat{P}$ matrix of our camera is calculated to be:
+\begin{equation}
+	%\mat{P} = \begin{pmatrix}
+	%	-0.0072e+05 & 0.0001e+05 & -0.0015e+05 & -1.2067e+05\\
+	%	-0.0017e+05 & -0.0057e+05 & 0.0017e+05 & -0.7543e+05\\
+	%	-0.0000 & 0.0000 & 0.0000 & -0.0076e+05
+	%\end{pmatrix}
+	\mat{P} = \left(\begin{array}{cccc} -677.0 & 222.3 & 13.15 & 2.786\cdot 10^5\\ -202.0 & -178.7 & -611.0 & 2.603\cdot 10^5\\ -0.7337 & -0.6792 & 0.0192 & 1033.0 \end{array}\right)
+\end{equation}
+
+The matrix $\mat{K}$ we obtained is as follows:
+\begin{equation}
+	%\mat{K} = \begin{pmatrix}
+	%	565.8032 & -0.9567 & 323.4267\\
+	%	0 & 554.6423 & 249.6787\\
+	%	-0.0000 & 0.0000 & 1.0000
+	%\end{pmatrix}
+	\mat{K} = \left(\begin{array}{ccc} 623.1 & -0.3841 & 346.0\\ 0 & 616.1 & 257.9\\ 0 & 0 & 1.0 \end{array}\right)
+\end{equation}
+
+
+\newpage
+
+\newpage
+\appendix
+\subsection{Remove Lens Distortion}
+\lstinputlisting{codes/lens_distortion.m}
+\subsection{Corner Function}
+\lstinputlisting{codes/get_corners.m}
+\subsection{Error Function for Distorted Image}
+\lstinputlisting{codes/err_func.m}
+\subsection{Undistort Image using K}
+\lstinputlisting{codes/undistortimage.m}
+\subsection{Vec2mat Function}
+\lstinputlisting{codes/vec2mat.m}
+\subsection{Geometric Distance from World to Image}
+\lstinputlisting{codes/geoDist.m}
+\subsection{Camera Calibration}
+\lstinputlisting{codes/camera_calibration.m}
+\subsection{Normalization}
+\lstinputlisting{codes/normalize.m}
+
 % conference papers do not normally have an appendix
 
 
