@@ -480,20 +480,20 @@ With few changes, we can build the 3D process of normalization as follows:
 
 \subsection{Build World Coordinate System}
 As we showed in the above sections, the greatest different in applying DLT into camera calibration is that we are now mapping points from 3D world space to 2D image space, i.e., we will have $\mat{X}_i$ to be 4D (3 dimensions for coordinates, 1 for homogenization). In the previous DLT we implemented, both $\mat{x}_i$ and $\mat{x}_i^\prime$ are selected from actual measurements and they are all in 2D (3D after homogenization) space. In our case for this project, we already have the 2D image space measurements while the real-world point locations cannot be obtained directly. Therefore, we introduce our definition of a world coordinate system here in order to obtain corresponding world coordinates for every points on the image. As shown in Figure \ref{world_sys}, we use the baseline of the left checker board (lowest line that goes through edge of black ceils) as the x-axis, the baseline of right checker board as y-axis, and the intersection line between two checker boards as the z-axis.
-\begin{figure*}
-  \label{world_sys}
+\begin{figure}
   \centering \includegraphics{world_sys.png}
   \caption{Establishing the World Coordinate System}
-\end{figure*}
+  \label{world_sys}
+\end{figure}
 
 We still need more information after the coordinate system is established, we need a well-defined distance metric for the world frame. Here we have measured the edge length of both black ceils and white ceils to be 24.5 mm, the distance between z-axis and right most black ceil edges on left checker board to be 21 mm, the distance between z-axis and left mots black ceil edges on right checker board to be 23.5 mm. Be noticed that we don't necessarily need a unified unit like mm when building the system, we just need to make sure the distance we assigned through the system is proportional to the actual distance. Now we have built a solid world frame coordinate system and apparently through the measurements of distance above, we can compute the real-world coordinates of every corner points in the image. To ensure the correspondence of real-world coordinates and coordinates in the image, we have to do some sorting algorithms on corner points and follow the same sequence while obtaining coordinates in both spaces, we skipped the details in doing this and we welcome readers to find out through codes attached in appendix.
 
 \subsection{Camera Calibration Steps}
 According to the textbook, the camera calibration steps can be carried out as shown in Figure \ref{calibrate_gold}.
 \begin{figure*}
-  \label{calibrate_gold}
   \centering \includegraphics{calibration_gold.png}
   \caption{Algorithm of Camera Calibration using Gold Standard}
+  \label{calibrate_gold}
 \end{figure*}
 
 After performing all those steps we can get the calibration results. Since we have lots of noise points in the previous image we are using, here we apply another image for the camera calibration process, and the calibrated pictures are shown in Figure \ref{cam_cali}.
@@ -533,10 +533,34 @@ The toolbox usage for camera calibration can be summarized as follows:
 	\begin{itemize}
 		\item Download all files from the website.
 		\item Extract the compressed folder to certain directory and add this directory to MATLAB PATH variable.
-		\item Input command \emph{calib_gui} in MATLAB to open the toolbox.
+		\item Input command \emph{calib\_gui} in MATLAB to open the toolbox.
 	\end{itemize}
 	\item Corner Detection
+	\begin{itemize}
+		\item Select four corners of the checker board.
+		\item Input the number of corners we have in each axis (notice that the actual numbers we need to input is the total squares we have minus 1) defined by the toolbox in the figure.
+		\item The tool will automatically generate markers on all corner points and we can check if they are correct for use, as showin in Figure \ref{toolbox_corner}.
+	\end{itemize}
+	\item Calibration
+	\begin{itemize}
+		\item Input the edge of squares we have in figures (in our case I used 245).
+		\item We can choose if we need a initial guess for lens distortion (if the points marked in figure are relatively far away from actual corners), this is actually the same as we do in the project.
+		\item Do calibration and get the results through the command line. Be noticed that the results we are getting are fc (focal length), cc (principal point), alpha\_c (skew), kc ($k$ for removing lens distortion) and err (pixel error). We can further compose the $K$ matrix for calibration using fc, cc and alpha\_c.
+	\end{itemize}
 \end{itemize}
+An example of results we get from the toolbox (after removing lens distortion) is shown in Figure \ref{toolbox_result}.
+
+\begin{figure}
+  \centering \includegraphics[width=\linewidth]{toolbox_corner.png}
+  \caption{Toolbox Corner Detection}
+  \label{toolbox_corner}
+\end{figure}
+
+\begin{figure}
+  \centering \includegraphics[width=\linewidth]{toolbox.png}
+  \caption{Result From Calibration Toolbox after Removing Lens Distortion}
+  \label{toolbox_result}
+\end{figure}
 
 
 \section{Report requirement}
@@ -546,7 +570,7 @@ The toolbox usage for camera calibration can be summarized as follows:
 	\item Images before and after correcting the lens distortion: all the required images are provided in Section I.
 	\item Set of points used for camera calibration (superimpose your points on top of your calibration object.): Please refer to Figure \ref{pchoice-2nd} for the super imposed point choice, however since we have too many point choices we skipped all the coordinates of those points here.
 	\item Math about calibration process: shown in Section II.
-	\item Matrix P's from both the your calibration algorithm and matlab toolbox: 
+	\item Matrix P(K) from both the your calibration algorithm and matlab toolbox: The result we got from tool box is shown in Appendix.
 	\item Results from testing objects, point positions (measured vs. those computed from P), mean error and variance in image coordinate system: the mean error we get in testing objects is: $8.003623$ while the variance we got is $13.145783$. (This is the actual best results we got, and the results really do vary a lot with different image input in different lighting conditions).
 	\item Discussion about what you learn from the process.
 \end{itemize}
@@ -584,6 +608,8 @@ The $k$ we obtained through 3 order $L(r)$ function:
 \end{equation}
 
 \subsection{Camera Calibration}
+In the camera calibration experiments, we tested our algorithm both with and without lens distortion to see the influence of lens distortion:
+\subsubsection{Results With Lens Distortion}
 The $\mat{P}$ matrix of our camera is calculated to be:
 \begin{equation}
 	%\mat{P} = \begin{pmatrix}
@@ -604,6 +630,23 @@ The matrix $\mat{K}$ we obtained is as follows:
 	\mat{K} = \left(\begin{array}{ccc} 623.1 & -0.3841 & 346.0\\ 0 & 616.1 & 257.9\\ 0 & 0 & 1.0 \end{array}\right)
 \end{equation}
 
+\subsubsection{Results after Removing Lens Distortion}
+The $\mat{P}$ matrix of our camera is calculated to be:
+\begin{equation}
+	\mat{P} = \left(\begin{array}{cccc} 681.6 & -225.8 & -14.15 & -2.803\cdot 10^5\\ 201.8 & 179.7 & 617.2 & -2.622\cdot 10^5\\ 0.7306 & 0.6824 & -0.02201 & -1040.0 \end{array}\right)
+\end{equation}
+
+The matrix $\mat{K}$ we obtained is as follows:
+\begin{equation}
+	\mat{K} = \left(\begin{array}{ccc} 630.3 & -0.08575 & 344.2\\ 0 & 623.0 & 256.5\\ 0 & 0 & 1.0 \end{array}\right)
+\end{equation}
+
+\subsubsection{Results from MATLAB Calibration Toolbox}
+
+The matrix $\mat{K}$ we obtained is as follows:
+\begin{equation}
+	\mat{K} = \left(\begin{array}{ccc} 2373.88011\pm 2698.81159 & 0 & 319.50000\\ 0 & 2398.58830\pm 2654.44721 & 239.50000\\ 0 & 0 & 1.0 \end{array}\right)
+\end{equation}
 
 \newpage
 
@@ -615,6 +658,8 @@ The matrix $\mat{K}$ we obtained is as follows:
 \lstinputlisting{codes/get_corners.m}
 \subsection{Error Function for Distorted Image}
 \lstinputlisting{codes/err_func.m}
+\subsection{Undistort Points using K}
+\lstinputlisting{codes/undistortPts.m}
 \subsection{Undistort Image using K}
 \lstinputlisting{codes/undistortimage.m}
 \subsection{Vec2mat Function}

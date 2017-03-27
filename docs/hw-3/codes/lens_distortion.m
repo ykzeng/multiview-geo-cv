@@ -118,3 +118,6 @@ dev_final = err_func(kfinal);
 % lens distortion correction
 undistorted_img = undistortimage(single_fig, 1, x_c, y_c, kfinal(1), kfinal(2), kfinal(3), 0, 0, 0);
 figure(2); imshow(undistorted_img); hold on;
+
+kfinal = [kfinal 0];
+undisPts = undistortPts(measuredPts, x_c, y_c, kfinal);

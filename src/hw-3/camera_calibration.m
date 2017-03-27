@@ -33,7 +33,14 @@ for i = 1 : hLinesCount
     sortedVCorners = [sortedVCorners; tmpVPtsSet];
 end
 % get the first two row (2d coordinate for img frame)
-imgPts = sortedVCorners(:, 1:3);
+%imgPts = sortedVCorners(:, 1:3);
+% remove lens distortion
+% legacy from lens distortion
+k = [7.35094247828436e-05,-4.63575177452332e-07,7.15015120029531e-10,0];
+[y_c, x_c] = size(two_img);
+x_c = x_c / 2;
+y_c = y_c / 2;
+imgPts = undistortPts(sortedVCorners, x_c, y_c, k);
 
 % test the sequence of rawVCorners(partially sorted) points
 % for i = 1 : ptsCount
