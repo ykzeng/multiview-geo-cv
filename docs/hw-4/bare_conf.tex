@@ -1,0 +1,616 @@
+
+%% bare_conf.tex
+%% V1.4b
+%% 2015/08/26
+%% by Michael Shell
+%% See:
+%% http://www.michaelshell.org/
+%% for current contact information.
+%%
+%% This is a skeleton file demonstrating the use of IEEEtran.cls
+%% (requires IEEEtran.cls version 1.8b or later) with an IEEE
+%% conference paper.
+%%
+%% Support sites:
+%% http://www.michaelshell.org/tex/ieeetran/
+%% http://www.ctan.org/pkg/ieeetran
+%% and
+%% http://www.ieee.org/
+
+%%*************************************************************************
+%% Legal Notice:
+%% This code is offered as-is without any warranty either expressed or
+%% implied; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE!
+%% User assumes all risk.
+%% In no event shall the IEEE or any contributor to this code be liable for
+%% any damages or losses, including, but not limited to, incidental,
+%% consequential, or any other damages, resulting from the use or misuse
+%% of any information contained here.
+%%
+%% All comments are the opinions of their respective authors and are not
+%% necessarily endorsed by the IEEE.
+%%
+%% This work is distributed under the LaTeX Project Public License (LPPL)
+%% ( http://www.latex-project.org/ ) version 1.3, and may be freely used,
+%% distributed and modified. A copy of the LPPL, version 1.3, is included
+%% in the base LaTeX documentation of all distributions of LaTeX released
+%% 2003/12/01 or later.
+%% Retain all contribution notices and credits.
+%% ** Modified files should be clearly indicated as such, including  **
+%% ** renaming them and changing author support contact information. **
+%%*************************************************************************
+
+
+% *** Authors should verify (and, if needed, correct) their LaTeX system  ***
+% *** with the testflow diagnostic prior to trusting their LaTeX platform ***
+% *** with production work. The IEEE's font choices and paper sizes can   ***
+% *** trigger bugs that do not appear when using other class files.       ***                          ***
+% The testflow support page is at:
+% http://www.michaelshell.org/tex/testflow/
+
+
+
+\documentclass[conference]{IEEEtran}
+% Some Computer Society conferences also require the compsoc mode option,
+% but others use the standard conference format.
+%
+% If IEEEtran.cls has not been installed into the LaTeX system files,
+% manually specify the path to it like:
+% \documentclass[conference]{../sty/IEEEtran}
+
+
+
+
+
+% Some very useful LaTeX packages include:
+% (uncomment the ones you want to load)
+
+
+% *** MISC UTILITY PACKAGES ***
+%
+%\usepackage{ifpdf}
+% Heiko Oberdiek's ifpdf.sty is very useful if you need conditional
+% compilation based on whether the output is pdf or dvi.
+% usage:
+% \ifpdf
+%   % pdf code
+% \else
+%   % dvi code
+% \fi
+% The latest version of ifpdf.sty can be obtained from:
+% http://www.ctan.org/pkg/ifpdf
+% Also, note that IEEEtran.cls V1.7 and later provides a builtin
+% \ifCLASSINFOpdf conditional that works the same way.
+% When switching from latex to pdflatex and vice-versa, the compiler may
+% have to be run twice to clear warning/error messages.
+
+
+
+
+
+
+% *** CITATION PACKAGES ***
+%
+%\usepackage{cite}
+% cite.sty was written by Donald Arseneau
+% V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
+% \cite{} output to follow that of the IEEE. Loading the cite package will
+% result in citation numbers being automatically sorted and properly
+% "compressed/ranged". e.g., [1], \cite{seznec2007tage}, \cite{calder1997evidence}, \cite{lee1995branch}, \cite{jimenez2001dynamic}, \cite{jimenez2003fast} without using
+% cite.sty will become [1], \cite{calder1997evidence}, \cite{jimenez2001dynamic}--\cite{lee1995branch}, \cite{seznec2007tage} using cite.sty. cite.sty's
+% \cite will automatically add leading space, if needed. Use cite.sty's
+% noadjust option (cite.sty V3.8 and later) if you want to turn this off
+% such as if a citation ever needs to be enclosed in parenthesis.
+% cite.sty is already installed on most LaTeX systems. Be sure and use
+% version 5.0 (2009-03-20) and later if using hyperref.sty.
+% The latest version can be obtained at:
+% http://www.ctan.org/pkg/cite
+% The documentation is contained in the cite.sty file itself.
+
+
+
+
+
+
+% *** GRAPHICS RELATED PACKAGES ***
+%
+\ifCLASSINFOpdf
+  % \usepackage[pdftex]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../pdf/}{../jpeg/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+\else
+  % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
+  % will default to the driver specified in the system graphics.cfg if no
+  % driver is specified.
+  % \usepackage[dvips]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../eps/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.eps}
+\fi
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\usepackage{amsmath,amssymb,amsthm,latexsym,paralist, booktabs}
+\usepackage{url}
+\usepackage[pdftex]{graphicx}
+% default pic path
+\usepackage{bm}
+\usepackage{mathtools}
+\let\oldvec\vec
+\renewcommand{\vec}[1]{\oldvec{\mathit{#1}}}
+\newcommand{\mat}[1]{\mathbf{#1}} % undergraduate algebra version
+\newcommand{\parallelsum}{\mathbin{\!/\mkern-5mu/\!}}
+\graphicspath{{pics/}}
+\usepackage{subfigure}
+
+\usepackage{listings}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+
+%\newcommand{\mat}[1]{\bm{\mathit{#1}}}
+
+
+
+
+% *** Do not adjust lengths that control margins, column widths, etc. ***
+% *** Do not use packages that alter fonts (such as pslatex).         ***
+% There should be no need to do such things with IEEEtran.cls V1.6 and later.
+% (Unless specifically asked to do so by the journal or conference you plan
+% to submit to, of course. )
+
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+
+\begin{document}
+\lstset{language=Matlab,%
+    %basicstyle=\color{red},
+    breaklines=true,%
+    morekeywords={matlab2tikz},
+    keywordstyle=\color{blue},%
+    morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+    identifierstyle=\color{black},%
+    stringstyle=\color{mylilas},
+    commentstyle=\color{mygreen},%
+    showstringspaces=false,%without this there will be a symbol in the places where there is a space
+    numbers=left,%
+    numberstyle={\tiny \color{black}},% size of the numbers
+    numbersep=9pt, % this defines how far the numbers are from the text
+    emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+    %emph=[2]{word1,word2}, emphstyle=[2]{style},    
+}
+%
+% paper title
+% Titles are generally capitalized except for words such as a, an, and, as,
+% at, but, by, for, in, nor, of, on, or, the, to and up, which are usually
+% not capitalized unless they are the first or last word of the title.
+% Linebreaks \\ can be used within to get better formatting as desired.
+% Do not put math or special symbols in the title.
+\title{CSCE 643 Multi-View Geometry CV\\
+Project IV}
+
+
+% author names and affiliations
+% use a multiple column layout for up to three different
+% affiliations
+
+% conference papers do not typically use \thanks and this command
+% is locked out in conference mode. If really needed, such as for
+% the acknowledgment of grants, issue a \IEEEoverridecommandlockouts
+% after \documentclass
+
+% for over three affiliations, or if they all won't fit within the width
+% of the page, use this alternative format:
+%
+%\author{\IEEEauthorblockN{Michael Shell\IEEEauthorrefmark{1},
+%Homer Simpson\IEEEauthorrefmark{2},
+%James Kirk\IEEEauthorrefmark{3},
+%Montgomery Scott\IEEEauthorrefmark{3} and
+%Eldon Tyrell\IEEEauthorrefmark{4}}
+%\IEEEauthorblockA{\IEEEauthorrefmark{1}School of Electrical and Computer Engineering\\
+%Georgia Institute of Technology,
+%Atlanta, Georgia 30332--0250\\ Email: see http://www.michaelshell.org/contact.html}
+%\IEEEauthorblockA{\IEEEauthorrefmark{2}Twentieth Century Fox, Springfield, USA\\
+%Email: homer@thesimpsons.com}
+%\IEEEauthorblockA{\IEEEauthorrefmark{3}Starfleet Academy, San Francisco, California 96678-2391\\
+%Telephone: (800) 555--1212, Fax: (888) 555--1212}
+%\IEEEauthorblockA{\IEEEauthorrefmark{4}Tyrell Inc., 123 Replicant Street, Los Angeles, California 90210--4321}}
+
+
+
+
+% use for special paper notices
+%\IEEEspecialpapernotice{(Invited Paper)}
+
+
+
+
+% make the title area
+\maketitle
+% As a general rule, do not put math, special symbols or citations
+% in the abstract
+
+% no keywords
+
+
+
+
+% For peer review papers, you can put extra information on the cover
+% page as needed:
+% \ifCLASSOPTIONpeerreview
+% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
+% \fi
+%
+% For peerreview papers, this IEEEtran command inserts a page break and
+% creates the second title. It will be ignored for other modes.
+\IEEEpeerreviewmaketitle
+
+
+\section{Checkerboard configuration. All points in 3D as a ground truth.}
+\subsection{Checkerboard Picture}
+As the checkerboard for this time differs from last time, we retook photos using the new checkerboard and established a new coordinate system. The picture we used in this paper is shown in Figure \ref{p3p}.
+\begin{figure}
+  \centering \includegraphics[width=0.8\linewidth]{p3p.jpg}
+  \caption{The Checkerboard Configuration for P3P}
+  \label{p3p}
+\end{figure}
+
+\subsection{World Coordinate}
+For establishment of world coordinate system, we choose the lower bound of checkerboard (the line formed by lower edges of black and white ceils) as the x-axis, and the leftmost counterpart as the y-axis, as shown in Figure \ref{world}. The side length of both black and white ceils is measured to be 30 mm, now we can easily build the coordinate system using mm as the unit. 
+\begin{figure}
+  \centering \includegraphics[width=0.8\linewidth]{world_system.jpg}
+  \caption{The World Coordinate System for P3P}
+  \label{world}
+\end{figure}
+
+\subsection{Points Choice}
+Similar to previous projects, we prefer points that are not colinear for P3P processing, therefore, we selected 3 points (green marker) as $A, B, C$ and the fourth point $C$ marked as red, shown in Figure \ref{pts_choice}. The world coordinates ($W$) and coordinates in the image plane ($I$) are respectively shown as follows:
+\begin{equation}
+	W = \left(\begin{array}{ccc} 0 & 270.0 & 0\\ 30.0 & 60.0 & 0\\ 180.0 & 210.0 & 0 \end{array}\right)
+\end{equation}
+
+\begin{equation}
+	I = \left(\begin{array}{ccc} 176.0 & 139.0\\ 227.0 & 466.0\\ 434.0 & 236.0 \end{array}\right)
+\end{equation}
+
+\begin{figure}
+  \centering \includegraphics[width=0.8\linewidth]{pts_choice.png}
+  \caption{Point Choice for Solving P3P}
+  \label{pts_choice}
+\end{figure}
+
+\section{Images for P3P}
+As mentioned above, we adopted Figure \ref{p3p} for step 2 and 3.
+
+\section{Mathematical Foundation}
+\subsection{P3P System Model}
+We assume a pinhole camera model in this paper, moreover, the original of real-world coordinate system is assumed to be at the optical center of camera. As shown in Figure \ref{principle}, when applying P3P approach, we have four maps $A\leftrightarrow u, B\leftrightarrow v, C\leftrightarrow w, D\leftrightarrow z$ that maps real-world points $A, B, C, D$ to $u, v, w, z$ on the image plane. 
+\begin{figure}
+  \centering \includegraphics[width=0.8\linewidth]{p3p_principle.png}
+  \caption{3D Real-World Points and Their 2D Counterparts on Image Plane in Camera Projection}
+  \label{principle}
+\end{figure}
+
+\subsection{Overview of Approach}
+In our further experiments, we will adopt three points $A, B, C$ for solving the P3P equations and use $D$ point and its projection for evaluation purpose. Overall, the steps we have to go through P3P are as follows:
+\begin{itemize}
+\item Acquire up to four solutions of distances $\|PA\|, \|PB\|, \|PC\|$ ($P$ is the camera optical center).
+\item Convert all distance solutions mentioned above into four sets of pose configurations.
+\item Use the fourth point $D$ to evaluate the choose the best pose configuration among the ``up to four'' solutions we have got. (Basically by applying the rotation and translation and comparing the results to real image point coordinates)
+\end{itemize}
+
+\subsection{P3P Equation System}
+Though seems to be an complex approach, P3P is actually rooted into the simple law of cosine. To illustrate how we can establish the P3P equation system through law of cosine, we take $P, A\leftrightarrow u, B\leftrightarrow v$ as an example and zoom into the plane $PAB$, as shown in Figure \ref{cosine_law}. 
+\begin{figure}
+  \centering \includegraphics[width=0.8\linewidth]{cosine_law.png}
+  \caption{Illustrating Law of Cosine in P3P Camera Model}
+  \label{cosine_law}
+\end{figure}
+
+As we can quickly infer accroding to geometry knowledge:
+\begin{equation}
+	PA^2 + PB^2 - 2\cdot PA\cdot PB\cdot cos\alpha _{u, v} = AB^2
+\end{equation}
+
+Similarly, if we apply law of cosines to other points, we can establish the P3P equation system as follows:
+\begin{equation}
+	\begin{cases} PB^2 + PC^2 - 2\cdot PB\cdot PC\cdot cos\alpha _{v, w} - BC^2 = 0 \\
+	 PA^2 + PC^2 - 2\cdot PA\cdot PC\cdot cos\alpha _{u, w} - AC^2 = 0 \\
+	 PB^2 + PA^2 - 2\cdot PA\cdot PB\cdot cos\alpha _{u, v} - AB^2 = 0 \end{cases}
+\end{equation}
+
+Then, if we divide both sides of the equation system by $PC^2$ and suppose  $v = \frac{AB^2}{PC^2}, av = \frac{BC^2}{PC^2}, bv = \frac{AC^2}{PC^2}$, we have:
+\begin{equation}
+	\begin{cases} y^2 + 1 - 2\cdot y\cdot cos\alpha _{v, w} - av = 0 \\
+	 y^2 + 1 - 2\cdot x\cdot cos\alpha _{u, w} - bv = 0 \\
+	 x^2 + y^2 - 2\cdot x\cdot y \cdot cos\alpha _{u, v} - v= 0 \end{cases}
+\end{equation}
+
+Apparently we can acquire $v = x^2 + y^2 - 2\cdot x\cdot y \cdot cos\alpha _{u, v}$. By replacing $v$ in first two equations in the system, we obtain:
+\begin{equation}
+	\begin{cases} (1 - a)y^2 - ax^2 - cos\alpha _{v, w}y + 2acos\alpha _{u, v}xy + 1 = 0 \\
+	 (1 - b)x^2 - by^2 - cos\alpha _{u, w}x + 2bcos\alpha _{u, v}xy + 1 = 0 \end{cases}
+\end{equation}
+
+% TODO
+To acquire ``up to four'' solutions of lengths, we need to solve the simplified equation system mentioned above through using Wu Ritt's zero decomposition method\cite{gao2003complete}.
+
+\section{P3P Steps from Scratch}
+In this section, we present the detailed steps for solving P3P from scratch. The basic conditions before applying P3P is that we know 4 points (both the coordinates in the image plane and in the world plane) as mentioned in section III. 
+\subsection{Normalizing the Data}
+The first step, similar to many other algorithms in Computer Vision, is to normalize the point coordinates, more specifically, to project image plane points $u, v, w$ onto a unit sphere centered at camera optical center $P$. By applying the following equation system, we first remove unit from image points coordinates:
+\begin{equation}
+	\begin{cases}
+		u_x^{\prime} = \frac{u_x - c_x}{f_x}\\
+		u_y^{\prime} = \frac{u_y - c_y}{f_y}\\
+		u_z^{\prime} = 1
+	\end{cases}
+\end{equation}
+
+Recall that $c_x, c_y$ are the image optical center and $f_x, f_y$ are the focal values, both in pixels.
+
+After removing unit, we can normalize using L2 norm as follows:
+\begin{equation}
+	\begin{cases}
+		N_u &= \sqrt{(u_x^{\prime})^2 + (u_y^{\prime})^2 + (u_z^{\prime})^2}\\
+		\bar{u}_x &= \frac{u_x^{\prime}}{N_u}\\
+		\bar{u}_y &= \frac{u_y^{\prime}}{N_u}\\
+		\bar{u}_z &= \frac{u_z^{\prime}}{N_u}
+	\end{cases}
+\end{equation}
+
+As we will only be using normalized results $\bar{u}_x, \bar{u}_y, \bar{u}_z$ in the following paper instead of the original $u_x, u_y, u_z$, we replace $\bar{u}_x, \bar{u}_y, \bar{u}_z$ with $u_x, u_y, u_z$ for simplicity.
+
+\subsection{The P3P Equation System}
+According to the simplified equation 6 we derived for P3P, we have to first compute cosine values, distances between points in the world coordinate system and $a, b$ before continuing. The calculation of cosines can be done as show in the following equations:
+
+\begin{equation}
+	\begin{cases}
+		cos\alpha _{u, v} = (u_x\times v_x + u_y \times v_y + u_z\times v_z)\\
+		cos\alpha _{u, w} = (u_x\times w_x + u_y \times w_y + u_z\times w_z)\\
+		cos\alpha _{v, w} = (v_x\times w_x + v_y\times w_y + v_z\times w_z)
+	\end{cases}
+\end{equation} 
+
+The distances we want to obtain is actually the geometric distances between three points in actual world coordinate system, thus we can easily compute them:
+\begin{equation}
+	\begin{cases}
+		\|AB\| = \sqrt{(A_x - B_x)^2 + (A_y - B_y)^2 + (A_z - B_z)^2}\\
+		\|BC\| = \sqrt{(B_x - C_x)^2 + (B_y - C_y)^2 + (B_z - C_z)^2}\\
+		\|AC\| = \sqrt{(A_x - C_x)^2 + (A_y - C_y)^2 + (A_z - C_z)^2}
+	\end{cases}
+\end{equation}
+
+Also be noticed that the distances are not used when solving P3P, but they are necessary in computing reprojections based on P3P solutions.
+
+Furthermore, according to the definition of $a, b$, we have:
+\begin{equation}
+	\begin{cases}
+		a = \frac{BC^2}{AB^2}\\
+		b = \frac{AC^2}{AB^2}
+	\end{cases}
+\end{equation}
+
+After obtaining all these data, we can now use Wu Ritt's zero decomposition method to get $(x, y)$ solution of the simplified equation system using cosine values and $a, b$. One thing worth mention here is that this method might present us multi degenerated solutions to the system. However, in most of regular cases (approx. 99\%), the method can yield good and realistic 
+% TODO
+results. Using method from \cite{gao2003complete}, we can obtain the quartic polynomial equation system:
+\begin{equation}
+	\begin{cases}
+		a_0x^4 + a_1x^3 + a_2x^2 + a_3x + a_4 = 0\\
+		b_0y - b_1 = 0
+	\end{cases}
+\end{equation}
+
+where $\{a_0, a_1, \dots , a_4\}$ and $\{b_0, b_1\}$ are defined in Figure \ref{a_values} and \ref{b_values} respectively.
+
+\begin{figure}
+  \centering \includegraphics[width=\linewidth]{a_values.png}
+  \caption{Defining a0 to a4 in P3P Quartic Polynomial}
+  \label{a_values}
+\end{figure}
+\begin{figure}
+  \centering \includegraphics[width=\linewidth]{b_values.png}
+  \caption{Defining b0 to b1 in P3P Quartic Polynomial}
+  \label{b_values}
+\end{figure}
+
+To solve the quartic polynomial eqaution system, we adopted \emph{roots} function in MATLAB, which gives us up to four solutions of $x$ in the equation system as expected (in nondegenerated cases), using which we can further solve $y$ and extract $\|PA\|, \|PB\|, \|PC\|$ respectively.
+
+\subsection{Reproject Points to 3D Space}
+From the last step, we should have acquired four sets of distances $\|PA\|, \|PB\|, \|PC\|$. For every set of those distances, we can easily obtain the 3D coordinates of $A, B, C$ by multiply the $\vec{u}, \vec{v}, \vec{w}$ with corresponding distances like $\mat{A} = \vec{u}\cdot \|PA\|$.
+
+\subsection{Computing Rotation Matrix and Translation Vector}
+The coordinates we calculated in last section is actually in the coordinate system where camera optical center is the origin. However, the world coordinate system we build by ourself is not. Therefore, in this section we compute the rotation matrix and translation vector that can transform points from the actual camera coordinate system to the world system we established. This part can be done 
+% TODO
+referring to the article in \cite{optimaltrans} \cite{besl1992method}. The basic steps we follow is summarized below:
+\begin{itemize}
+	\item Find the centroids for both coordinate systems, which can be computed simply by \emph{mean} function in MATLAB.
+	\item Find the optimal rotation matrix $R$ using Singular Value Decomposition.
+	\item Find the translation vector by $t = -R\times centroid_A + centroid_B$, where $centroid_A, centroid_B$ are centroid of point coordinates in both systems.
+\end{itemize}
+
+Iterating through all the Rotation matrix and translation vector we acquired from up to four solutions, we can compare the reprojected error of the fourth point $D$ and simply use the least-error solution as the optimal solution of P3P.
+
+
+\section{Result Comparison}
+As we have collected all the rotation matrix and translation vectors in the above section, we can now begin to make comparisons between the results of our implemented approach and other OpenCV approaches. The methodology we used for comparing results are as follows:
+\begin{itemize}
+	\item Based on the rotation matrix and translation vector we have, we can reproject the real-world point coordinates to the image space.
+	\item After getting all the point coordinates reprojected from the last step, we can calculate the geometric distances between the fourth point and its correspondance in the image.
+	\item The geometric distance between reprojected and actual point coordinates of the fourth point can be regarded as the error for evaluating rotation matrix and translation vector.
+\end{itemize}
+
+\section{What I Learnt from the Process}
+\subsection{Data Normalization}
+Similar to the projects we have done before, in P3P we also did normalization for points on the image plane before we started to calculate further. This remind me the importance of data normalization. Especially when we are using different cameras, if we didn't do normalization before doing P3P, as the focal lengths and image center might differ a lot, the results we are actually getting from P3P will also vary a lot, which makes it harder for us to do further comparison between those results.
+\subsection{Law of Cosines in P3P}
+Though P3P seems to be difficult, but it's actually based on simple laws of cosine. The reason for such simple geometric relations is due to the underlying pinhole model, which is a basic geometric model that preserves a lot of nice properties.
+\subsection{Finding Optimal Rotation and Translation}
+After solving P3P, we need to calculate rotation matrix and translation vector and use them to reproject real-world points back to the image space for evaluating the errors implied in the process. In this paper, we referred to \cite{optimaltrans} as the approach for finding optimal rotation and translation between two spaces of the same dimensions, for more details about the theories in this approach please refer to \cite{besl1992method}. This approach can be widely used in other scanarios as we have generalized it as a function to find rotation and translation relationship between any given coordinate systems.
+\bibliographystyle{IEEEtran}
+% argument is your BibTeX string definitions and bibliography database(s)
+\bibliography{refs}
+
+\onecolumn
+\section{Rotation and Translation Matrices}
+\subsection{Results by Applying Previous Approach}
+By running the camera calibration approach we implemented in the previous work, we acquired the camera intrinsic matrix $\mat{K}$, camera projection matrix $\mat{P}$ and rotation matrix $\mat{R}$ as follows:
+\begin{equation}
+	\mat{K} = \begin{pmatrix}
+		438.7795938256493 & 0 & 156.4369276062062\\
+ 0 & 428.3166621327036 & 319.7357482216087\\
+ 0 & 0 & 1
+	\end{pmatrix}
+\end{equation}
+
+\begin{equation}
+	\mat{P} = \begin{pmatrix}
+		0.01250334096155751 & -1.508972143103616 & 0.2711271464990632 & 429.3745812434286\\
+ 1.392761823410536 & -0.1564946875375584 & 1.063217835681911 & 194.2898588817989\\
+ -5.201079254875831e-05 & -0.0005401809842625952 & 0.003246235734237596 & 1
+	\end{pmatrix}
+\end{equation}
+
+\begin{equation}
+	\mat{R} = \begin{pmatrix}
+		0.01429199017916619 & -0.98637248668008 & -0.1639056330248407\\
+ 0.9997729828680795 & 0.01150624289447384 & 0.01793290555141357\\
+ -0.01580258661679046 & -0.1641247205481505 & 0.9863130103375954
+	\end{pmatrix}
+\end{equation}
+The translation vector $\mat{t}$ we obtained using previous method is as follows:
+\begin{equation}
+	\mat{t} = \begin{pmatrix}
+		188.9956201169497 \\
+ -88.98691955355272 \\
+ 303.8328362709736
+	\end{pmatrix}
+\end{equation}
+
+\subsection{Results from Out Implemented P3P Approach}
+The rotation matrix $\mat{R}$:
+\begin{equation}
+	\mat{R} = \left(\begin{array}{ccc} 0.8968 & 0.0336 & 0.4411\\ -0.1628 & -0.9021 & 0.3997\\ 0.4114 & -0.4303 & -0.8035 \end{array}\right)
+\end{equation}
+
+The rotation matrix $\mat{t}$:
+\begin{equation}
+	\mat{t} = \left(\begin{array}{c} -41.14\\ 161.9\\ 285.0 \end{array}\right)
+\end{equation}
+
+\subsection{Results from OpenCV P3P Approach}
+The rotation matrix $\mat{R}$:
+\begin{equation}
+	\mat{t} = \begin{pmatrix}
+	0.9751724927065563 & -0.03073146620254604 & 0.2193038678489812\\
+ -0.06618979781684881 & -0.9855013514892844 & 0.1562241878767766\\
+ 0.2113232598022431 & -0.1668612093862306 & -0.9630679190320474
+ 	\end{pmatrix}
+\end{equation}
+
+The rotation matrix $\mat{t}$:
+\begin{equation}
+	\mat{t} = \begin{pmatrix}
+	19.44234760445592 \\
+ 160.6071508385414 \\
+ 295.0200953938722
+ 	\end{pmatrix}
+\end{equation}
+
+\subsection{Results from OpenCV Iterative Approach}
+The rotation matrix $\mat{R}$:
+\begin{equation}
+	\mat{t} = \begin{pmatrix}
+	0.9877447941077802 & -0.01613246165380006 & 0.1552416355040364\\
+ -0.01456187073648512 & -0.9998306912563339 & -0.01124903296001547\\
+ 0.1553968263306344 & 0.008850565115871789 & -0.9878124790988907
+ 	\end{pmatrix}
+\end{equation}
+
+The rotation matrix $\mat{t}$:
+\begin{equation}
+	\mat{t} = \begin{pmatrix}
+	16.00623525135875\\
+ 154.3321069948261\\
+ 271.0935835353657
+ 	\end{pmatrix}
+\end{equation}
+
+\subsection{Results from OpenCV EPNP Approach}
+The rotation matrix $\mat{R}$:
+\begin{equation}
+	\mat{t} = \begin{pmatrix}
+	0.9906641741585167 & -0.01403403102579241 & -0.1356006637594024\\
+ -0.01047654084380424 & -0.9995828747533818 & 0.02691316762689056\\
+ -0.1359218015285684 & -0.02524128508876093 & -0.9903979712198003
+ 	\end{pmatrix}
+\end{equation}
+
+The rotation matrix $\mat{t}$:
+\begin{equation}
+	\mat{t} = \begin{pmatrix}
+	15.3524522558304\\
+ 153.5550546788758\\
+ 299.6401600830907
+ 	\end{pmatrix}
+\end{equation}
+
+\newpage
+\appendix
+\subsection{P3P Main Function}
+\lstinputlisting{codes/new_p3p.m}
+\subsection{Corner Function}
+\lstinputlisting{codes/get_corners.m}
+\subsection{Function for Finding Optimal Rotation and Translation}
+\lstinputlisting{codes/rigid_trans.m}
+
+% conference papers do not normally have an appendix
+
+
+% use section* for acknowledgment
+
+
+
+
+
+% trigger a \newpage just before the given reference
+% number - used to balance the columns on the last page
+% adjust value as needed - may need to be readjusted if
+% the document is modified later
+%\IEEEtriggeratref{8}
+% The "triggered" command can be changed if desired:
+%\IEEEtriggercmd{\enlargethispage{-5in}}
+
+% references section
+
+% can use a bibliography generated by BibTeX as a .bbl file
+% BibTeX documentation can be easily obtained at:
+% http://mirror.ctan.org/biblio/bibtex/contrib/doc/
+% The IEEEtran BibTeX style support page is at:
+% http://www.michaelshell.org/tex/ieeetran/bibtex/
+%\bibliographystyle{IEEEtran}
+% argument is your BibTeX string definitions and bibliography database(s)
+%\bibliography{IEEEabrv,../bib/paper}
+%
+% <OR> manually copy in the resultant .bbl file
+% set second argument of \begin to the number of references
+% (used to reserve space for the reference number labels box)
+%\bibliographystyle{IEEEtran}
+% argument is your BibTeX string definitions and bibliography database(s)
+%\bibliography{refs}
+
+
+
+
+% that's all folks
+\end{document}
+
+
