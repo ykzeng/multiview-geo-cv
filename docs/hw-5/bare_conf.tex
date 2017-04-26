@@ -1,0 +1,375 @@
+\documentclass[conference]{IEEEtran}
+
+% *** GRAPHICS RELATED PACKAGES ***
+%
+\ifCLASSINFOpdf
+  % \usepackage[pdftex]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../pdf/}{../jpeg/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+\else
+  % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
+  % will default to the driver specified in the system graphics.cfg if no
+  % driver is specified.
+  % \usepackage[dvips]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../eps/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.eps}
+\fi
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\usepackage{amsmath,amssymb,amsthm,latexsym,paralist, booktabs}
+\usepackage{url}
+\usepackage[pdftex]{graphicx}
+% default pic path
+\usepackage{bm}
+\usepackage{mathtools}
+\let\oldvec\vec
+\renewcommand{\vec}[1]{\oldvec{\mathit{#1}}}
+\newcommand{\mat}[1]{\mathbf{#1}} % undergraduate algebra version
+\newcommand{\parallelsum}{\mathbin{\!/\mkern-5mu/\!}}
+\graphicspath{{pics/}}
+\usepackage{subfigure}
+
+\usepackage{listings}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+
+
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+
+\begin{document}
+\lstset{language=Matlab,%
+    %basicstyle=\color{red},
+    breaklines=true,%
+    morekeywords={matlab2tikz},
+    keywordstyle=\color{blue},%
+    morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+    identifierstyle=\color{black},%
+    stringstyle=\color{mylilas},
+    commentstyle=\color{mygreen},%
+    showstringspaces=false,%without this there will be a symbol in the places where there is a space
+    numbers=left,%
+    numberstyle={\tiny \color{black}},% size of the numbers
+    numbersep=9pt, % this defines how far the numbers are from the text
+    emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+    %emph=[2]{word1,word2}, emphstyle=[2]{style},    
+}
+\title{CSCE 643 Multi-View Geometry CV\\
+Project V}
+
+
+
+
+
+\maketitle
+
+\IEEEpeerreviewmaketitle
+
+\section{Problem Definition}
+The 3D reconstruction problem we are going to discuss about in this paper can be defined as follows:
+
+Suppose that we have two views of a real-world scene (e.g., two photos taken from different perspective that contain overlapping scenes), in which a set of points correspondences $\mat{x}_i\leftrightarrow \mat{x}_i^\prime$ could be found among the two views. The 3D reconstruction task is to find two camera matrices $\mat{P}$ and $\mat{P}^\prime$, as well as the real-world point set $\mat{X}_i$ so that:
+\begin{equation}
+	\forall i, \mat{x}_i = \mat{P}\mat{X}_i, \mat{x}_i^\prime = \mat{P}^\prime \mat{X}_i
+\end{equation}
+
+In this project, we are given two photos taken from different angles and share overlapped scenaries, so the first step is to find out sufficient point correspondences among two photos.
+
+\section{Point Correspondences in Original Images}
+Similar to 2D rectification, in 3D reconstruction, we also need to choose points on parallel lines so that we could bring the image back to affinity by leveraging the properties of vanishing point and infinity plane. However, different from the 2D cases where we only choose points and parallel lines on the same plane in one image and rectify the entire image targeting at it, here in the 3D reconstruction we have to choose point correspondences from two images and on both planes.
+
+With that, we begin our point selection process. As we are required to select at least 20 points, in this paper, we choose to select 10 points on both the plane of wall and plane of floor, respectively. Detailed point correspondences selection we adopted here can be summarized as follows:
+\begin{itemize}
+	\item Wall Plane
+		\begin{itemize}
+			\item 8 points (4 on each side) for the rectangle formed by the wall that surrounded elevator door.
+			\item 2 points on the small gap (which is actually the middle line of elevator door that cuts the elevator door in two halfs).
+		\end{itemize}
+	\item Floor Plane
+		\begin{itemize}
+			\item 8 points (4 on each side) from the cross points of tiles on the floor that formed a rectangle (starting from the foot of two sides of elevator door).
+			\item 2 points randomly selected outside of the rectangle we selected in the last step.
+		\end{itemize}
+\end{itemize}
+For better demonstration, we visualize the point correspondences as shown in Figure \ref{pts_choice}. The numerical expressions of point correspondences we selected can be also found in Section VII.
+
+\begin{figure*}[hbpt]
+  \centering \includegraphics[width=0.8\linewidth]{pts_choice_latest.png}
+  \caption{Visualizing Point Correspondences Selected for 3D Reconstruction}
+  \label{pts_choice}
+\end{figure*}
+
+\section{Methodologies}
+\subsection{Overview of Reconstruction Method}
+According to the textbook, the 3D reconstruction method from two-view can be summarized as follows:
+\begin{itemize}
+	\item Compute the fundamental matrix from point correspondences.
+	\item Compute the camera matrices from the fundamental matrix.
+	\item For each point correspondence $\mat{x}_i\leftrightarrow \mat{x}_i^\prime$, compute the point in space that projects to these two image points.
+\end{itemize}
+
+The first step regarding the computation of fundamental matrix and camera matrices are not neccessary in some cases while in this paper we assume no priori knowledge about the camera (i.e., the camera is not calibrated), therefore we have to conduct all steps mentioned above.
+
+\subsection{Computing Fundamental Matrix}
+\subsubsection{Problem Specification}
+After we have selected and obtained a set of correspondences $\mat{x}\leftrightarrow \mat{x}_i^\prime$ in two images as provided in the project, the fundamental matrix $\mat{F}$ satisfies the condition:
+\begin{equation}
+	\forall i, \mat{x}_i^\prime \mat{F}\mat{x}_i = 0
+\end{equation}
+
+As we have already learnt the coordinates of 20 corresponding points, the equation is linear in the (unknown) entries of the matrix $\mat{F}$. Moreover, each point correspondence generates one linear equation in the entries of $\mat{F}$. If we have at least 8 point correspondences, it is possible to solve linearly for the entries of $\mat{F}$ up to scale. In our case, we have 20 correspondences, which is much more than 8 equations, we can find a least-squares solution simply through SVD.
+
+With the definition of $\mat{F}$ in the previous discussion, any pair of point correspondences $\mat{x}_i\leftrightarrow \mat{x}_i^\prime$ in two images can provide a linear equation as shown in . Combining all the linear equations we came up, the unknown matrix $\mat{F}$ can be computed. For any specific linear equation provided by a pair of point, we can further expand the equation in Eq. 2 as follows:
+\begin{multline}
+	x^\prime xf_{11} + x^\prime yf_{12} + x^\prime f_{13} + y^\prime xf_{21} + y^\prime yf_{22}\\
+	 + y^\prime f_{23} + xf_{31} + yf_{32} + f_{33} = 0
+\end{multline}
+
+\noindent where $f_{ij}$ is the element in $i$th row and $j$th column of $\mat{F}$.
+
+If we denote by $\mat{f}$ the 9-vector made up of the entries of $\mat{F}$ in row-major order. Then 
+Eq. 3 can be expressed as a vector inner product as follows:
+\begin{equation}
+	(x^\prime x, x^\prime y, x^\prime, y^\prime x, y^\prime y, y^\prime, x, y, 1)\mat{f} = 0
+\end{equation}
+
+After obtaining $n$ set of point correspondences, we can construct matrix $\mat{A}$ for solving $\mat{f}$ shown in part I of section VII. Then Eq. 2 can be rewritten into the following form:
+\begin{equation}
+	\mat{A}\mat{f} = \mat{0}
+\end{equation}
+
+Be noticed that we can only obtain $\mat{f}$ up to scale, and matrix $\mat{A}$ must have a rank at most 8 so that the above equation is solvable. If the rank is exactly 8, then
+the solution is unique (up to scale), and can be found by linear methods. 
+
+\subsubsection{Normalized 8-Point Algorithm}
+Different from the exact solution case, in reality, the data is not necessarily exact, due to the existence of noises in photos taken from cameras. Under such circumstances, the rank of $\mat{A}$ may be greater than 8 and we can only find a least-square solution. In this paper, we adopted the same approaches from the estimation algorithm in DLT for finding the least-square solution of the system. The only difference is that here we have different formations of equation sets now. Recall from the estimation problem that the least-squares solution for $\mat{f}$ is the singular vector corresponding to the smallest singular value of $\mat{A}$, i.e., the last column of $V$ in the $SVD(A) = UDV^T$ . The solution vector $\mat{f}$ yielded by SVD minimizes $\|Af\|$ subject to the condition $\|f\| = 1$. The algorithm just described is the essence of \emph{linear solution} part in the 8-point algorithm for computation of
+the fundamental matrix.
+
+So far, we have been able to solve $\mat{f}$ (also $\mat{F}$) that minimizes $\mat{A}\mat{f}$ as closer as possible to $\mat{0}$ through SVD. Problem still exists in that the solution of $\mat{F}$ we have now doesn't necessarily have a rank of 2, which is an important property of the fundamental matrix and is heavily relied for many applications of fundamental matrix. To correct the rank discrepancy in our result, the simplest way is to correct $\mat{F}$, and then do another minimization to bring corrected matrix closer to the original $\mat{F}$. Specifically, suppose $\mat{F} = UDV^T$ is the SVD of $\mat{F}$ (the result we got after first SVD), we know that $D$ is a diagonal matrix $diag(r, s, t)$. Then $\mat{F}^\prime = U diag(r,s,0)V^T$ should minimize $\|\mat{F} - \mat{F}^\prime\|$. This part of work corrects $\mat{F}$ we get from first SVD to be of rank 2 and is known as \emph{constraint enforcement} in normalized 8-point algorithm.
+
+
+\subsection{Camera Matrices from Fundamental Matrix}
+Given the fundamental matrix we computed from last step, we can further extract camera matrices $\mat{P}, \mat{P}^\prime$ for both images based on it (if and only if $\mat{P^\prime}^T\mat{F}\mat{P}$ is skew-symmetric) as discussed in Chap. 9 of the textbook. We ignore the inductions for extracting camera matrices as they are provided in the textbook and jump directly to the result we are going to use:
+\begin{equation}
+	\mat{P} = \begin{bmatrix}
+			\mat{I} | \mat{0}
+		\end{bmatrix}, 
+	\mat{P}^\prime = [[e^\prime]_{\times}\mat{F} | e^\prime]
+\end{equation}
+
+where $e^\prime $ is the epipole such that ${e^\prime}^T \mat{F} = \mat{0}$ and assume $\mat{P}^\prime$ so defined is a valid rank 3 camera matrix.
+
+\subsection{Triangulation}
+Given the camera matrices $\mat{P}$ and $\mat{P}^\prime$ , let $\mat{x}$ and $\mat{x}^\prime$ be two points in the two images that satisfy the epipolar constraint, $\mat{x}^T\mat{F}\mat{x} = 0$. Such a constraint may be interpreted geometrically in terms of the rays in space corresponding to the two image points. More specifically, it means that $\mat{x}$ lies on the epipolar line $\mat{F}\mat{x}$, from which we further learn that the two rays back-projected from points $\mat{x}, \mat{x}^\prime$ on the image plane actually lie in the same epipolar plane (which is also the plane that contains the two camera centers) and they will intersect in some point. The 3D point $\mat{X}$ is projected to the points $\mat{x}$ and $\mat{x}^\prime$ in the two images, respectively through two cameras, as shown in Figure \ref{triangulation}.
+\begin{figure}[hbpt]
+  \centering \includegraphics[width=0.8\linewidth]{triangulation.png}
+  \caption{Two-view Triangulation}
+  \label{triangulation}
+\end{figure}
+
+\subsubsection{Errors in Real Measurements}
+However, the triangulation mentioned above assumed that there are no errors at all in the points on image plane, which is not even remotely possible when we are using an actual camera. 
+
+In reality, since there are unevitable errors in the measured points $\mat{x}$ and $\mat{x}^\prime$ , the rays back-projected from
+these points to their counterparts in real world coordinate are skew. This means that there will not be a point $\mat{X}$ that exactly satisfies
+$\mat{x} = \mat{P}\mat{X} , \mat{x}^\prime = \mat{P}\mat{X}^\prime$. Moreover, it's not likely that the image points will exactly satisfy the epipolar constraint
+$\mat{x}^\prime \mat{T} \mat{F}\mat{x} = 0$. A figure illustrating the skew problem we encountered due to errors in real measurements is shown in Figure \ref{err}.
+\begin{figure}[hbpt]
+  \centering \includegraphics[width=0.8\linewidth]{measurement_err.png}
+  \caption{Skew of Epipolar Line Due to Measurement Errors}
+  \label{err}
+\end{figure}
+
+\subsubsection{Linear Triangulation Methods}
+Assuming that there are some measurement errors, i.e., the estimated point does not exactly satisfy the geometric relations, and is not an optimal estimate. The linear triangulation method is the direct analogue of the DLT method. In each image we have a measurement $\mat{x} = \mat{P}\mat{X} , \mat{x}^\prime = \mat{P}\mat{X}^\prime$ , and
+these equations can be combined into a form $\mat{A}\mat{X} = \mat{0}$, which is an equation linear in $\mat{X}$. First the homogeneous scale factor is eliminated by a cross product to give three equations for each image point, of which two are linearly independent. For example
+for the first image, $\mat{x}\times (\mat{P}\mat{X}) = \mat{0}$, which can be expanded to obtain the following equations:
+\begin{equation}
+\begin{split}
+	x(\mat{p^3}^T\mat{x} - (\mat{p^1}^T\mat{X}) = 0\\
+	y(\mat{p^3}^T\mat{x}) - (\mat{p^2}^T\mat{X}) = 0\\
+	x(\mat{p^2}^T\mat{X}) - y(\mat{p^1}^T\mat{X}) = 0
+\end{split}
+\end{equation}
+
+\noindent where $\mat{p^i}^T$ are the rows of $\mat{P}$.
+An equation of form $\mat{A}\mat{X} = \mat{0}$ can be similarly composed, where:
+\begin{equation}
+	\mat{A} = \begin{bmatrix}
+	x\mat{p^3}^T - \mat{p^1}^T\\
+	y\mat{p^3}^T - \mat{p^2}^T\\
+	x^\prime \mat{p^{\prime 3}}^T - \mat{p^{\prime 1}}^T\\
+	y^\prime \mat{p^{\prime 3}}^T - \mat{p^{\prime2}}^T
+\end{bmatrix}
+\end{equation}
+the above two equations have been included from each image, giving a total of four equa-
+tions in four homogeneous unknowns. This is a redundant set of equations, since the
+solution is determined only up to scale. 
+
+As we have established the equation set, we need to do minimization to find out the closest estimation. Here similar to other estimation problems like when finding fundamental matrix and in DLT, we adopted SVD in this paper for minimizing those left sides of equations to zero. The detailed steps of doing SVD is ignored here for brevity as it's just another repetition of what we have discussed in section III.
+
+\subsection{Back to Affinity}
+For this part of work, we try to find the affinity transformation that can bring image back to the affined space, as we are literally using the same affinity rectification approach as we did in Project 1, we attached the approach of affinity rectification from Project 1 in the next section for reference.
+
+\section{Rectifying to Affinity}
+The key of using parallel lines in projective space to recover affine properties from images is the infinite line. In the affinity space, the infinite line is a fixed line $l_{\infty} = (0, 0, 1)^T$, however a projective transformation might maps $l_{\infty}$ from the fixed line at infinity to a finite line $l$ on the space after projection. Then, say we have the infinite line $l = (l_1, l_2, l_3)^T$ in a projective space, where $l_3\neq 0$, and the homography of this current projection $\mat{H}$ can be divided as:
+\begin{equation}
+	\mat{H}=\mat{H}_A\mat{H}_P
+\end{equation}
+\noindent where $\mat{H}_A$ is the affine homography and the last matrix $\mat{H}_P$ is the homography for transformation from affine space to current projective space:
+\begin{equation}
+	\mat{H}_P = 
+	\begin{bmatrix}
+		1 & 0 & 0 \\
+		0 & 1 & 0 \\
+		l_1 &  l_2 & l_3
+	\end{bmatrix}
+\end{equation}
+
+\noindent That is to say, the current projective transformation can be decomposed into two parts, one is the transformation to affine space and the other one is the transformation from affinity to current projective space, and the later one can be directly calculated if the infinite line is given.
+
+\begin{figure*}[hbpt]
+\subfigure[Reconstruction Results in 3D]{
+	\label{3d_recon} %% label for second subfigure
+	\includegraphics[width=0.49\linewidth]{3d_recon.png}}
+\subfigure[Reconstruction Results Projected in 2D Plane]{
+    \label{2d_recon} %% label for first subfigure
+    \includegraphics[width=0.49\linewidth]{2d_recon.png}}   
+\caption{3D Reconstruction Results}
+\label{recon} %% label for entire figure
+\end{figure*}
+
+Now that we figured out the infinite line could help us back to affinity, we can start to work on the details to calculate the infinite line. We know that in Euclidean space, two parallel line will intersect at an ideal point on infinite line, and if we can get two ideal points then we can easily calculate the infinite line as two points determine a line. Intuitively, we can identify two pairs of parallel lines from the distorted picture and calculate two ideal points through them to form the infinite line and then we can get back to affinity based on our discussion above.
+
+Suppose we have four points $p_1, p_2, p_3, p_4$ and they form a rectangle similar to what we have in question 1, through those we can simply get two pairs of parallel lines:
+\begin{equation}
+\begin{split}
+	\vec{l}_1 = p_1 \times p_2\\
+	\vec{l}_2 = p_3 \times p_4\\
+	\vec{m}_1 = p_1 \times p_3\\
+	\vec{m}_2 = p_2 \times p_4
+\end{split}
+\end{equation}
+
+\noindent in which we have $l_1\parallelsum l_2$ and $m_1\parallelsum m_2$. Through those pairs of parallel lines, we can further compute two points at the infinite line as follows:
+\begin{equation}
+\begin{split}
+	v_1 &= \vec{l}_1\times \vec{l}_2\\
+	v_2 &= \vec{m}_1 \times \vec{m}_2
+\end{split}
+\end{equation}
+
+\noindent And finally we can acquire the line at infinity $\vec{l}_{\infty} = (l_1, l_2, l_3)$ which can be calculated by:
+\begin{equation}
+	\vec{l}_{\infty} = v_1 \times v_2
+\end{equation}
+
+\noindent According to our discussion above, now we can form a new matrix same as given in equation 10 based on the infinite line, and the new $\mat{H}_P$ can handle the transformation between the picture space and affinity.
+
+To summarize, the following steps are needed when we are doing the affine rectification:
+\begin{enumerate}
+	\item Find two physically parallel line pairs in the picture plane. (here we can simply use those points we picked for the rectangle in our first question, since those four apexes naturally provide two parallel line pairs)
+	\item Through those parallel lines we got, solve two intercepts of those parallel lines in picture plane, which are ideal points that should lie on the line of infinity in the world plane.
+	\item From the two ideal points we can now get line of infinity in the picture plane.
+	\item Since we know the coordinates of infinite line in the world plane, we can now solve the homography transformation from picture plane to affinity.
+\end{enumerate}
+
+\section{Graphical Illustration of Reconstructed Planes}
+The reconstructed planes of wall and floor are shown in Figure \ref{recon}. For clarity of demonstration, we have marked the points unused in reconstruction (two points on elevator gap and other two outside of the rectangle on the floor plane) in red color, points used for reconstruction on the wall plane in green and points used for reconstruction on the floor plane in blue. With little tolerance of skews on parallel lines, we can apparently see that the parallelism in both planes is recovered and the four points not used for reconstruction lie in proper places. Be noticed between wall plane and floor plane shown in Figure \ref{recon} are not exactly perpendicular to each other, which is okay since after applying our reconstruction approach they are actually in the affined space, though the parallelism property is recovered, the angles might not be correct.
+
+\section{Discussions}
+\subsection{Point Selection}
+The first and foremost lessons I learnt from the point selection process is that we need to make sure the correspondence between points in a pair. Previously in the panorama project, I have already made a mistake due to forgetting the correct point selection sequence thereby causing mismatches in two point sets, which led to a long time of debugging. This time, to make sure that the point pairs are selected correctly, I referred to and modified a MATLAB code segment for selecting point pairs. This time when using MATLAB to choose point pairs, I contatenated two images together (one on the left side and the other on the right side, with a bound in between them for discrimination), and then use code to control the point selection sequence. For example, if I selected point on the left side (1st image) last time, the program will enforce me to select point from right side this time. After any point pair is choose, it will also draw a line between them for us to clearly see the point correspondence relations which is especially useful when we are selecting a lot of correspondences.
+\subsection{Fundamental Matrix}
+Based on the definition of fundamental matrix, it can actually be regarded as a combined matrix that contains two transformation, one from the image in the first view to a standard space, the other from the standard space to the second view. For simplicity, we can also regard the first view as the standard space, so that the transformation from first view to standard is a simple diagonal matrix and the transformation from standard to second view is the same transformation from first to second. This way, the fundamental matrix actually ``degenerated'' to one matrix that contains only one transformation. I hope my interpretation is correct in this part though...
+\subsection{Measurement Error and Minimization}
+The influence of measurement error and importance of minimization have been highlighted for numerous times in the class. However, in this project, I felt them to be underscored more strongly than ever. Due to measurement errors:
+\begin{itemize}
+	\item the fundamental matrix cannot be exactly solved.
+	\item there are skews in the back-projected ray from points in image space
+\end{itemize}
+
+And the solution to such problems is now really familiar to me, that is to use minimization approaches. A common step is first to build numerical relations based on the relationship we can infer from some properties, then set up linear equations (ideally with 0 at right side). Last, we can build up matrixes and use SVD to do the minimization.
+
+\onecolumn
+\section{Numerical Results}
+\subsection{A Matrix for Fundamental Matrix}
+The $\mat{A}$ matrix we constructed through point pairs when solving $\mat{F}$:
+\begin{equation}
+	\mat{A} = \begin{bmatrix}
+		x_1^\prime x_1 & x_1^\prime y_1 & x_1^\prime & y_1^\prime x_1	& y_1^\prime y_1 & y_1^\prime & x_1 & y_1 & 1\\
+		\cdots & \cdots & \cdots & \cdots & \cdots & \cdots & \cdots & \cdots & \cdots \\
+		x_n^\prime x_n & x_n^\prime y_n & x_n^\prime & y_n^\prime x_n	& y_n^\prime y_n & y_n^\prime & x_n & y_n & 1\\
+	\end{bmatrix}
+\end{equation}
+\subsection{Numerical Representation of Point Correspondences}
+The numerical expression of points choosed in the first image is shown as follows:
+\begin{equation}
+	\left(\begin{array}{cc} 664.3 & 75.34\\ 676.2 & 562.6\\ 685.0 & 1040.0\\ 723.5 & 1467.0\\ 1262.0 & 142.2\\ 1268.0 & 546.7\\ 1271.0 & 935.2\\ 1276.0 & 1305.0\\ 883.2 & 1005.0\\ 871.3 & 559.4\\ 791.5 & 1534.0\\ 948.2 & 1610.0\\ 1137.0 & 1706.0\\ 1359.0 & 1808.0\\ 1265.0 & 1375.0\\ 1427.0 & 1426.0\\ 1616.0 & 1493.0\\ 1832.0 & 1556.0\\ 1498.0 & 1301.0\\ 1646.0 & 1340.0 \end{array}\right)
+\end{equation}
+
+The numerical expressions of point correspondances in the second image are:
+\begin{equation}
+	\left(\begin{array}{cc} 830.2 & 518.0\\ 836.1 & 916.1\\ 818.4 & 1305.0\\ 821.3 & 1661.0\\ 1407.0 & 451.1\\ 1386.0 & 948.0\\ 1368.0 & 1413.0\\ 1336.0 & 1843.0\\ 1203.0 & 1381.0\\ 1223.0 & 932.0\\ 821.3 & 1738.0\\ 646.9 & 1789.0\\ 451.7 & 1849.0\\ 229.9 & 1910.0\\ 1268.0 & 1900.0\\ 1085.0 & 1973.0\\ 880.5 & 2059.0\\ 641.0 & 2161.0\\ 1596.0 & 2028.0\\ 1436.0 & 2114.0 \end{array}\right)
+\end{equation}
+
+\subsection{Intermediate Results}
+The fundamental matrix $\mat{F}$:
+\begin{equation}
+	\mat{F} = \left(\begin{array}{ccc} 6.524\cdot 10^{-9} & 2.236\cdot 10^{-7} & -0.0001097\\ 2.134\cdot 10^{-7} & -5.942\cdot 10^{-9} & -0.0008351\\ -0.0001682 & 0.0003871 & 0.5147 \end{array}\right)
+\end{equation}
+
+The plane at infinity $\mat{P}_{inf}$ is:
+\begin{equation}
+	\mat{P}_{inf} = \left(\begin{array}{c} 0.0002381\\ 3.178\cdot 10^{-5}\\ -1.0\\ -9.22\cdot 10^{-17} \end{array}\right)
+\end{equation}
+
+The homography matrix $\mat{H}$ used for transformation to affinity:
+\begin{equation}
+	\mat{H} = \left(\begin{array}{cccc} 1.0 & 0 & 0 & 0\\ 0 & 1.0 & 0 & 0\\ 0 & 0 & 1.0 & 0\\ 0.0002381 & 3.178\cdot 10^{-5} & -1.0 & -9.22\cdot 10^{-17} \end{array}\right)
+\end{equation}
+
+Camera matrix $\mat{P}$ for the first camera (that produced the first figure in our paper):
+\begin{equation}
+	\mat{P} = \left(\begin{array}{cccc} 1.0 & 0 & 0 & 0\\ 0 & 1.0 & 0 & 0\\ 0 & 0 & 1.0 & 0 \end{array}\right)
+\end{equation}
+
+Camera matrix $\mat{P}^\prime$ for the second camera that produced the second figure:
+\begin{equation}
+	\mat{P}^\prime = \left(\begin{array}{cccc} -7.425\cdot 10^{-5} & 0.0001709 & 0.2272 & -0.8973\\ -0.0001509 & 0.0003474 & 0.4618 & 0.4414\\ -1.943\cdot 10^{-7} & -9.337\cdot 10^{-8} & 0.0007978 & 0.000525 \end{array}\right)
+\end{equation}
+
+Numerical representation of the 3D wall plane $\mat{P}_{wall}$:
+\begin{equation}
+	\mat{P}_{wall} = \left(\begin{array}{cccc} -0.0001684 & -2.247\cdot 10^{-5} & 0.7071 & 0.7071 \end{array}\right)
+\end{equation}
+
+Numerical representation of the 3D floor plane $\mat{P}_{floor}$:
+\begin{equation}
+	\mat{P}_{floor} = \left(\begin{array}{cccc} -0.0001684 & -2.247\cdot 10^{-5} & 0.7071 & 0.7071 \end{array}\right)
+\end{equation}
+
+\newpage
+\appendix
+\section{Code Section}
+\subsection{Fundamental Matrix Estimation}
+\lstinputlisting{codes/estimate_Fundamental_Matrix.m}
+\subsection{Point Selection with GUI}
+\lstinputlisting{codes/hao.m}
+\subsection{Main Function for 3D Reconstruction}
+\lstinputlisting{codes/main.m}
+
+
+\end{document}
+
+

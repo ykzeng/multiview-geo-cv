@@ -1,0 +1,23 @@
+@inproceedings{besl1992method,
+  title={Method for registration of 3-D shapes},
+  author={Besl, Paul J and McKay, Neil D},
+  booktitle={Robotics-DL tentative},
+  pages={586--606},
+  year={1992},
+  organization={International Society for Optics and Photonics}
+}
+@article{gao2003complete,
+  title={Complete solution classification for the perspective-three-point problem},
+  author={Gao, Xiao-Shan and Hou, Xiao-Rong and Tang, Jianliang and Cheng, Hang-Fei},
+  journal={IEEE transactions on pattern analysis and machine intelligence},
+  volume={25},
+  number={8},
+  pages={930--943},
+  year={2003},
+  publisher={IEEE}
+}
+@misc{optimaltrans,
+  author = {Aruba Networks},
+  title = {Finding optimal rotation and translation between corresponding 3D points},
+  howpublished = "\url{http://nghiaho.com/?page_id=671}"
+}
